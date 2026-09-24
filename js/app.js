@@ -468,16 +468,59 @@ document.getElementById('give-type').addEventListener('change', e => {
   document.getElementById('give-gift-row').classList.toggle('hidden', !isGift);
 });
 
+
+const EXTRA_ADMIN_GIFTS = [
+  { id: 'vintage_cigar', name: 'Vintage Cigar', emoji: '🚬', rarity: 'epic', value: 15, short: 'vintage_cigar' },
+  { id: 'snoop_cigar', name: 'Snoop Cigar', emoji: '🚬', rarity: 'epic', value: 18, short: 'snoop_cigar' },
+  { id: 'low_rider', name: 'Low Rider', emoji: '🚗', rarity: 'legendary', value: 50, short: 'low_rider' },
+  { id: 'voodoo_doll', name: 'Voodoo Doll', emoji: '🪆', rarity: 'rare', value: 8, short: 'voodoo_doll' },
+  { id: 'swiss_watch', name: 'Swiss Watch', emoji: '⌚', rarity: 'epic', value: 20, short: 'swiss_watch' },
+  { id: 'diamond_ring', name: 'Diamond Ring', emoji: '💍', rarity: 'legendary', value: 35, short: 'diamond_ring' },
+  { id: 'plush_pepe', name: 'Plush Pepe', emoji: '🐸', rarity: 'mythic', value: 150, short: 'plush_pepe' },
+  { id: 'durov_cap', name: "Durov's Cap", emoji: '🧢', rarity: 'legendary', value: 45, short: 'durovs_cap' },
+  { id: 'durov_glasses', name: "Durov's Glasses", emoji: '🕶️', rarity: 'mythic', value: 280, short: 'durovs_glasses' },
+  { id: 'heart_locket', name: 'Heart Locket', emoji: '💟', rarity: 'legendary', value: 40, short: 'heart_locket' },
+  { id: 'precious_peach', name: 'Precious Peach', emoji: '🍑', rarity: 'legendary', value: 55, short: 'precious_peach' },
+  { id: 'scared_cat', name: 'Scared Cat', emoji: '😿', rarity: 'rare', value: 3, short: 'scared_cat' },
+  { id: 'toy_bear', name: 'Toy Bear', emoji: '🐻', rarity: 'rare', value: 2.5, short: 'toy_bear' },
+  { id: 'loot_bag', name: 'Loot Bag', emoji: '🛍️', rarity: 'rare', value: 4, short: 'loot_bag' },
+  { id: 'heroic_helmet', name: 'Heroic Helmet', emoji: '⛑️', rarity: 'epic', value: 18, short: 'heroic_helmet' },
+  { id: 'mini_oscar', name: 'Mini Oscar', emoji: '🏆', rarity: 'epic', value: 12, short: 'mini_oscar' },
+  { id: 'ion_gem', name: 'Ion Gem', emoji: '💠', rarity: 'epic', value: 10, short: 'ion_gem' },
+  { id: 'neko_helmet', name: 'Neko Helmet', emoji: '😺', rarity: 'rare', value: 3.5, short: 'neko_helmet' },
+  { id: 'genie_lamp', name: 'Genie Lamp', emoji: '🪔', rarity: 'epic', value: 14, short: 'genie_lamp' },
+  { id: 'astral_shard', name: 'Astral Shard', emoji: '✦', rarity: 'epic', value: 13, short: 'astral_shard' },
+  { id: 'mighty_arm', name: 'Mighty Arm', emoji: '💪', rarity: 'epic', value: 16, short: 'mighty_arm' },
+  { id: 'khabib', name: "Khabib's Papakha", emoji: '🎩', rarity: 'legendary', value: 40, short: 'khabibs_papakha' },
+  { id: 'perfume', name: 'Perfume Bottle', emoji: '🧴', rarity: 'epic', value: 11, short: 'perfume_bottle' },
+  { id: 'signet_ring', name: 'Gem Signet', emoji: '💍', rarity: 'legendary', value: 28, short: 'gem_signet' },
+  { id: 'love_heart', name: 'Love Heart', emoji: '💙', rarity: 'common', value: 0.08, short: 'love_heart' },
+  { id: 'teddy', name: 'Teddy Bear', emoji: '🧸', rarity: 'common', value: 0.08, short: 'teddy_bear' },
+  { id: 'gift_box', name: 'Gift Box', emoji: '🎁', rarity: 'common', value: 0.12, short: 'gift_box' },
+  { id: 'gem', name: 'Gem', emoji: '💎', rarity: 'uncommon', value: 0.4, short: 'gem' },
+  { id: 'bday_cake', name: 'Birthday Cake', emoji: '🎂', rarity: 'uncommon', value: 0.25, short: 'birthday_cake' },
+  { id: 'santa_hat', name: 'Santa Hat', emoji: '🎅', rarity: 'uncommon', value: 0.35, short: 'santa_hat' },
+  { id: 'crystal_ball', name: 'Crystal Ball', emoji: '🔮', rarity: 'rare', value: 2.8, short: 'crystal_ball' },
+  { id: 'jingle_bells', name: 'Jingle Bells', emoji: '🔔', rarity: 'uncommon', value: 0.3, short: 'jingle_bells' },
+  { id: 'spy_agaric', name: 'Spy Agaric', emoji: '🍄', rarity: 'rare', value: 2, short: 'spy_agaric' },
+  { id: 'evil_eye', name: 'Evil Eye', emoji: '🧿', rarity: 'rare', value: 1.8, short: 'evil_eye' },
+  { id: 'kissed_frog', name: 'Kissed Frog', emoji: '🐸', rarity: 'rare', value: 2.2, short: 'kissed_frog' },
+  { id: 'ice_cream', name: 'Ice Cream', emoji: '🍦', rarity: 'uncommon', value: 0.25, short: 'ice_cream' },
+  { id: 'jelly_bunny', name: 'Jelly Bunny', emoji: '🐰', rarity: 'uncommon', value: 0.2, short: 'jelly_bunny' }
+];
+
 function buildAdminGiftList() {
   const sel = document.getElementById('give-gift-select');
-  if (!sel || typeof CASES === 'undefined') return;
+  if (!sel) return;
   const map = {};
-  Object.values(CASES).forEach(c => c.items.forEach(i => { map[i.id] = i; }));
+  if (typeof CASES !== 'undefined') Object.values(CASES).forEach(c => c.items.forEach(i => { map[i.id] = i; }));
+  EXTRA_ADMIN_GIFTS.forEach(i => { map[i.id] = i; });
   const list = Object.values(map).sort((a,b) => (b.value||0)-(a.value||0));
   sel.innerHTML = list.map(i =>
     '<option value="' + i.id + '">' + i.emoji + ' ' + i.name + ' (' + i.rarity + ', ' + (i.value||0) + ' TON)</option>'
   ).join('');
 }
+
 
 async function findUser(target) {
   target = target.trim();
@@ -529,7 +572,9 @@ document.getElementById('give-gift-btn').addEventListener('click', async () => {
   const user = await findUser(target);
   if (!user) return showToast('Пользователь не найден', 'error');
   const inv = user.data.inventory || [];
-  inv.unshift({ ...gift, wonAt: new Date().toISOString(), fromAdmin: true });
+  const full = { ...gift, wonAt: new Date().toISOString(), fromAdmin: true };
+  if (!full.img && full.short && typeof CDN !== 'undefined') full.img = CDN + full.short + '.webp';
+  inv.unshift(full);
   await db.collection('users').doc(user.id).update({ inventory: inv });
   showToast(gift.emoji + ' ' + gift.name + ' → ' + (user.data.username || target), 'success');
   if (user.id === currentUser.uid) await loadUserData();
@@ -599,19 +644,18 @@ function openCase(caseId) {
   document.getElementById('spin-result').classList.add('hidden');
   document.getElementById('spin-btn').disabled = false;
   document.getElementById('spin-btn').textContent = 'Открыть';
-  // Preview chest
-  const em = document.getElementById('preview-chest-emoji');
-  if (em) em.textContent = caseId === 'nft' ? '💎' : caseId === 'bear' ? '🧸' : '🤖';
+  // Preview chest image
   const pn = document.getElementById('preview-case-name');
-  if (pn) pn.textContent = caseId === 'nft' ? 'NFT Box' : caseId === 'bear' ? "Animal's Box" : 'MechaGram Box';
+  if (pn) pn.textContent = caseId === 'nft' ? 'Villian Box' : caseId === 'bear' ? "Animal's Box" : 'MechaGram Box';
   const pp = document.getElementById('preview-case-price');
   if (pp) pp.textContent = c.price.toFixed(2);
-  const chest = document.getElementById('preview-chest');
-  if (chest) {
-    chest.className = 'chest-wrap big ' + (caseId === 'nft' ? 'nft-glow' : caseId === 'bear' ? 'bear-glow' : 'mecha-glow');
-    const box = chest.querySelector('.chest-box');
-    if (box) box.className = 'chest-box ' + (caseId === 'nft' ? 'nft-chest' : caseId === 'bear' ? 'bear-chest' : 'mecha-chest');
+  const img = document.getElementById('preview-chest-img');
+  if (img) {
+    img.src = caseId === 'nft' ? 'assets/cases/chest-nft.svg' : caseId === 'bear' ? 'assets/cases/chest-bear.svg' : 'assets/cases/chest-mecha.svg';
   }
+  const chest = document.getElementById('preview-chest');
+  if (chest) chest.className = 'chest-img-wrap big ' + (caseId === 'nft' ? 'nft-glow' : caseId === 'bear' ? 'bear-glow' : 'mecha-glow');
+
 
   // Odds list
   const odds = getItemChances(caseId);
@@ -801,6 +845,26 @@ window.onRocketWin = async (win) => {
   showToast('Забрал ' + win.toFixed(2) + ' TON', 'success');
 };
 window.onRocketLose = () => {};
+
+
+// Find Pepe
+document.getElementById('pepe-start')?.addEventListener('click', async () => {
+  if (PepeGame.active) return;
+  const bet = parseFloat(document.getElementById('pepe-bet').value);
+  const mult = parseInt(document.getElementById('pepe-mult').value, 10);
+  if (!bet || bet <= 0) return showToast('Укажи ставку', 'error');
+  if ((userData.balance || 0) < bet) return showToast('Недостаточно TON', 'error');
+  await setBalance(userData.balance - bet);
+  PepeGame.start(bet, mult);
+});
+
+window.onPepeWin = async (winAmount) => {
+  await setBalance((userData.balance || 0) + winAmount);
+  showToast('Pepe найден! +' + winAmount.toFixed(2) + ' TON', 'success');
+};
+window.onPepeLose = () => {
+  showToast('Pepe ускользнул', 'error');
+};
 
 // Mines start / cashout
 document.getElementById('mines-start').addEventListener('click', async () => {

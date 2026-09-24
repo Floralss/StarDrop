@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 180" width="200" height="180">
+  <defs>
+    <linearGradient id="abody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a28"/>
+      <stop offset="100%" stop-color="#0f1f14"/>
+    </linearGradient>
+    <linearGradient id="alid" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2d5a3a"/>
+      <stop offset="100%" stop-color="#1a3824"/>
+    </linearGradient>
+    <filter id="ag"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="asoft"><feGaussianBlur stdDeviation="10"/></filter>
+  </defs>
+  <ellipse cx="100" cy="165" rx="75" ry="10" fill="#22c55e" opacity="0.4" filter="url(#asoft)"/>
+  <rect x="35" y="70" width="130" height="85" rx="10" fill="url(#abody)" stroke="#3d7a4a" stroke-width="2"/>
+  <rect x="42" y="78" width="116" height="70" rx="6" fill="#0a150e" opacity="0.45"/>
+  <rect x="85" y="100" width="30" height="28" rx="4" fill="#2a5a35" stroke="#4ade80" stroke-width="1.5"/>
+  <circle cx="100" cy="112" r="6" fill="#4ade80"/>
+  <rect x="97" y="112" width="6" height="10" rx="1" fill="#86efac"/>
+  <path d="M30 72 Q100 40 170 72 L160 78 Q100 52 40 78 Z" fill="url(#alid)" stroke="#3d8a4a" stroke-width="2"/>
+  <path d="M40 72 Q100 48 160 72" fill="none" stroke="#6ee7b7" stroke-width="1.5" opacity="0.45"/>
+  <text x="100" y="145" text-anchor="middle" fill="#86efac" font-family="Arial,sans-serif" font-size="14" font-weight="bold">GIFT</text>
+  <g filter="url(#ag)">
+    <text x="55" y="58" font-size="22">🐻</text>
+    <text x="130" y="52" font-size="20">🐵</text>
+    <text x="95" y="48" font-size="18">🐤</text>
+    <text x="150" y="68" font-size="16">🧸</text>
+  </g>
+</svg>

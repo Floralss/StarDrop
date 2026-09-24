@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 180" width="200" height="180">
+  <defs>
+    <linearGradient id="mbody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2a1f48"/>
+      <stop offset="100%" stop-color="#140f24"/>
+    </linearGradient>
+    <linearGradient id="mlid" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3d2d6e"/>
+      <stop offset="100%" stop-color="#241a40"/>
+    </linearGradient>
+    <filter id="mg"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="msoft"><feGaussianBlur stdDeviation="10"/></filter>
+  </defs>
+  <ellipse cx="100" cy="165" rx="75" ry="10" fill="#8b5cf6" opacity="0.4" filter="url(#msoft)"/>
+  <rect x="35" y="70" width="130" height="85" rx="10" fill="url(#mbody)" stroke="#6d4ec9" stroke-width="2"/>
+  <rect x="42" y="78" width="116" height="70" rx="6" fill="#0c0818" opacity="0.5"/>
+  <rect x="85" y="100" width="30" height="28" rx="4" fill="#3b2a6e" stroke="#a78bfa" stroke-width="1.5"/>
+  <circle cx="100" cy="112" r="6" fill="#a78bfa"/>
+  <rect x="97" y="112" width="6" height="10" rx="1" fill="#c4b5fd"/>
+  <path d="M30 72 Q100 40 170 72 L160 78 Q100 52 40 78 Z" fill="url(#mlid)" stroke="#7c5cff" stroke-width="2"/>
+  <path d="M40 72 Q100 48 160 72" fill="none" stroke="#c4b5fd" stroke-width="1.5" opacity="0.45"/>
+  <text x="100" y="145" text-anchor="middle" fill="#c4b5fd" font-family="Arial,sans-serif" font-size="12" font-weight="bold">MECHA</text>
+  <g filter="url(#mg)">
+    <text x="55" y="55" font-size="18">⚙️</text>
+    <text x="135" y="50" font-size="18">🤖</text>
+    <text x="90" y="45" font-size="16">◆</text>
+    <text x="150" y="70" font-size="14">💎</text>
+  </g>
+</svg>

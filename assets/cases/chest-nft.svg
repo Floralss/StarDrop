@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 180" width="200" height="180">
+  <defs>
+    <linearGradient id="body" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2d2640"/>
+      <stop offset="100%" stop-color="#1a1528"/>
+    </linearGradient>
+    <linearGradient id="lid" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3d3558"/>
+      <stop offset="100%" stop-color="#2a2340"/>
+    </linearGradient>
+    <filter id="g"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="soft"><feGaussianBlur stdDeviation="8"/></filter>
+  </defs>
+  <ellipse cx="100" cy="165" rx="70" ry="8" fill="#7c3aed" opacity="0.35" filter="url(#soft)"/>
+  <!-- body -->
+  <rect x="35" y="70" width="130" height="85" rx="10" fill="url(#body)" stroke="#5b4a8a" stroke-width="2"/>
+  <rect x="42" y="78" width="116" height="70" rx="6" fill="#12101c" opacity="0.5"/>
+  <!-- lock plate -->
+  <rect x="85" y="100" width="30" height="28" rx="4" fill="#4c3d6e" stroke="#8b7ab8" stroke-width="1.5"/>
+  <circle cx="100" cy="112" r="6" fill="#a78bfa"/>
+  <rect x="97" y="112" width="6" height="10" rx="1" fill="#c4b5fd"/>
+  <!-- lid -->
+  <path d="M30 72 Q100 40 170 72 L160 78 Q100 52 40 78 Z" fill="url(#lid)" stroke="#6b5b95" stroke-width="2"/>
+  <path d="M40 72 Q100 48 160 72" fill="none" stroke="#9f8ecf" stroke-width="1.5" opacity="0.5"/>
+  <!-- brand -->
+  <text x="100" y="145" text-anchor="middle" fill="#c4b5fd" font-family="Arial,sans-serif" font-size="14" font-weight="bold">1GIFT</text>
+  <!-- floating items -->
+  <g filter="url(#g)">
+    <circle cx="55" cy="55" r="8" fill="#22c55e" opacity="0.9"/>
+    <text x="55" y="59" text-anchor="middle" font-size="10">👁</text>
+    <text x="145" y="50" font-size="16">🍄</text>
+    <text x="70" y="48" font-size="14">💀</text>
+    <text x="130" y="62" font-size="12">🔮</text>
+  </g>
+</svg>

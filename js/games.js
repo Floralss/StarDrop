@@ -308,6 +308,86 @@ const GiftUpgrade = {
 window.UPGRADE_TARGETS = UPGRADE_TARGETS;
 window.GiftUpgrade = GiftUpgrade;
 
+
+// Find Pepe: 3 tries, 1 pepe on grid, mult x4/x8/x16
+const PepeGame = {
+  active: false,
+  tries: 3,
+  pepeIndex: -1,
+  cells: 25,
+  mult: 4,
+  bet: 0,
+  found: false,
+
+  start(bet, mult) {
+    this.bet = bet;
+    this.mult = mult;
+    this.cells = mult === 4 ? 25 : mult === 8 ? 50 : 100;
+    this.tries = 3;
+    this.found = false;
+    this.active = true;
+    this.pepeIndex = Math.floor(Math.random() * this.cells);
+    this.render();
+    document.getElementById('pepe-tries').textContent = '3';
+    document.getElementById('pepe-result').textContent = '';
+    document.getElementById('pepe-result').className = 'cs-upgrade-result';
+  },
+
+  render() {
+    const g = document.getElementById('pepe-grid');
+    if (!g) return;
+    const cols = this.cells <= 25 ? 5 : this.cells <= 50 ? 10 : 10;
+    g.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+    g.className = 'pepe-grid' + (this.cells > 50 ? ' pepe-dense' : '');
+    let html = '';
+    for (let i = 0; i < this.cells; i++) {
+      html += '<button class="pepe-cell" data-i="' + i + '"></button>';
+    }
+    g.innerHTML = html;
+    g.querySelectorAll('.pepe-cell').forEach(btn => {
+      btn.addEventListener('click', () => this.click(parseInt(btn.dataset.i, 10), btn));
+    });
+  },
+
+  click(i, btn) {
+    if (!this.active || this.found || btn.classList.contains('open')) return;
+    btn.classList.add('open');
+    if (i === this.pepeIndex) {
+      btn.classList.add('pepe-win');
+      btn.textContent = '🐸';
+      this.found = true;
+      this.active = false;
+      // reveal all empty
+      document.querySelectorAll('.pepe-cell:not(.open)').forEach(c => {
+        c.classList.add('open');
+        c.textContent = '·';
+      });
+      const win = this.bet * this.mult;
+      document.getElementById('pepe-result').textContent = '🐸 Нашёл! +' + win.toFixed(2) + ' TON';
+      document.getElementById('pepe-result').className = 'cs-upgrade-result win';
+      if (typeof onPepeWin === 'function') onPepeWin(win);
+    } else {
+      btn.textContent = '❌';
+      btn.classList.add('pepe-miss');
+      this.tries--;
+      document.getElementById('pepe-tries').textContent = String(this.tries);
+      if (this.tries <= 0) {
+        this.active = false;
+        // show pepe
+        const cells = document.querySelectorAll('.pepe-cell');
+        if (cells[this.pepeIndex]) {
+          cells[this.pepeIndex].classList.add('open', 'pepe-win');
+          cells[this.pepeIndex].textContent = '🐸';
+        }
+        document.getElementById('pepe-result').textContent = 'Не нашёл… −' + this.bet.toFixed(2) + ' TON';
+        document.getElementById('pepe-result').className = 'cs-upgrade-result lose';
+        if (typeof onPepeLose === 'function') onPepeLose();
+      }
+    }
+  }
+};
+window.PepeGame = PepeGame;
+
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.game-card').forEach(card => {
     card.addEventListener('click', () => {
@@ -318,9 +398,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (view) view.classList.add('active');
       if (g === 'mines') { MinesGame.active = false; MinesGame.grid = Array(25).fill(null); MinesGame.render(); }
       if (g === 'upgrade' && typeof fillUpgradeInventory === 'function') fillUpgradeInventory();
+      if (g === 'pepe') { PepeGame.active = false; document.getElementById('pepe-grid').innerHTML = ''; document.getElementById('pepe-result').textContent = ''; }
     });
   });
-  ['mines', 'rocket', 'upgrade'].forEach(g => {
+  ['mines', 'rocket', 'upgrade', 'pepe'].forEach(g => {
     const btn = document.getElementById('back-' + g);
     if (btn) btn.addEventListener('click', () => {
       document.querySelectorAll('.game-view').forEach(v => v.classList.remove('active'));

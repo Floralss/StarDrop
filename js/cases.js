@@ -115,14 +115,16 @@ function generateRouletteItems(caseId, winner, count=50) {
 /** Visual: real TG gift image with emoji fallback */
 function itemVisual(item, size) {
   const sz = size || '';
-  const img = item.img || (item.short ? CDN + item.short + '.webp' : '');
+  const short = item.short || item.id || '';
+  const imgUrl = item.img || (short ? CDN + short + '.webp' : '');
   const emoji = item.emoji || '🎁';
-  if (img) {
-    return '<span class="item-vis ' + sz + '" style="--rc:var(--r-' + (item.rarity||'common') + ')">' +
-      '<img class="item-img" src="' + img + '" alt="' + (item.name||'') + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'inline\'"/>' +
-      '<span class="item-emoji" style="display:none">' + emoji + '</span></span>';
+  const rc = item.rarity || 'common';
+  if (!imgUrl) {
+    return '<span class="item-vis ' + sz + '" style="--rc:var(--r-' + rc + ')"><span class="item-emoji">' + emoji + '</span></span>';
   }
-  return '<span class="item-vis ' + sz + '" style="--rc:var(--r-' + (item.rarity||'common') + ')"><span class="item-emoji">' + emoji + '</span></span>';
+  return '<span class="item-vis ' + sz + '" style="--rc:var(--r-' + rc + ')">' +
+    '<img class="item-img" src="' + imgUrl + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'inline\'">' +
+    '<span class="item-emoji" style="display:none">' + emoji + '</span></span>';
 }
 
 window.CASES=CASES; window.CDN=CDN;
