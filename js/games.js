@@ -141,20 +141,21 @@ const RocketGame = {
 
 // Catalog of upgrade targets (gifts you can aim for)
 const UPGRADE_TARGETS = [
-  { id: 't_gift_box', name: 'Gift Box', emoji: '🎁', rarity: 'uncommon', value: 0.5 },
-  { id: 't_gem', name: 'Gem', emoji: '💎', rarity: 'uncommon', value: 0.8 },
-  { id: 't_toy_bear', name: 'Toy Bear', emoji: '🐻', rarity: 'rare', value: 2.5 },
-  { id: 't_scared_cat', name: 'Scared Cat', emoji: '😿', rarity: 'rare', value: 3.5 },
-  { id: 't_loot_bag', name: 'Loot Bag', emoji: '🛍️', rarity: 'rare', value: 5.0 },
-  { id: 't_ion_gem', name: 'Ion Gem', emoji: '💠', rarity: 'epic', value: 12.0 },
-  { id: 't_mini_oscar', name: 'Mini Oscar', emoji: '🏆', rarity: 'epic', value: 15.0 },
-  { id: 't_swiss', name: 'Swiss Watch', emoji: '⌚', rarity: 'epic', value: 20.0 },
-  { id: 't_helmet', name: 'Heroic Helmet', emoji: '⛑️', rarity: 'legendary', value: 30.0 },
-  { id: 't_locket', name: 'Heart Locket', emoji: '💟', rarity: 'legendary', value: 40.0 },
-  { id: 't_cap', name: "Durov's Cap", emoji: '🧢', rarity: 'legendary', value: 55.0 },
-  { id: 't_peach', name: 'Precious Peach', emoji: '🍑', rarity: 'mythic', value: 80.0 },
-  { id: 't_pepe', name: 'Plush Pepe', emoji: '🐸', rarity: 'mythic', value: 150.0 },
-  { id: 't_glasses', name: "Durov's Glasses", emoji: '🕶️', rarity: 'mythic', value: 300.0 }
+  { id: 'gift_box', name: 'Gift Box', emoji: '🎁', rarity: 'uncommon', value: 0.5 },
+  { id: 'gem', name: 'Gem', emoji: '💎', rarity: 'uncommon', value: 0.8 },
+  { id: 'toy_bear', name: 'Toy Bear', emoji: '🐻', rarity: 'rare', value: 2.5 },
+  { id: 'scared_cat', name: 'Scared Cat', emoji: '😿', rarity: 'rare', value: 3.5 },
+  { id: 'loot_bag', name: 'Loot Bag', emoji: '🛍️', rarity: 'rare', value: 5.0 },
+  { id: 'neko_helmet', name: 'Neko Helmet', emoji: '😺', rarity: 'rare', value: 4.0 },
+  { id: 'ion_gem', name: 'Ion Gem', emoji: '💠', rarity: 'epic', value: 12.0 },
+  { id: 'mini_oscar', name: 'Mini Oscar', emoji: '🏆', rarity: 'epic', value: 15.0 },
+  { id: 'swiss_watch', name: 'Swiss Watch', emoji: '⌚', rarity: 'epic', value: 20.0 },
+  { id: 'heroic_helmet', name: 'Heroic Helmet', emoji: '⛑️', rarity: 'epic', value: 22.0 },
+  { id: 'heart_locket', name: 'Heart Locket', emoji: '💟', rarity: 'legendary', value: 40.0 },
+  { id: 'durov_cap', name: "Durov's Cap", emoji: '🧢', rarity: 'legendary', value: 55.0 },
+  { id: 'precious_peach', name: 'Precious Peach', emoji: '🍑', rarity: 'legendary', value: 70.0 },
+  { id: 'plush_pepe', name: 'Plush Pepe', emoji: '🐸', rarity: 'mythic', value: 150.0 },
+  { id: 'durov_glasses', name: "Durov's Glasses", emoji: '🕶️', rarity: 'mythic', value: 300.0 }
 ];
 
 const GiftUpgrade = {

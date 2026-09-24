@@ -28,6 +28,106 @@ function showToast(msg, type) {
 }
 window.showToast = showToast;
 
+/** Epic+ drop ceremony: sirens for mythic, flash, card reveal */
+function playRareDropCeremony(item) {
+  return new Promise(resolve => {
+    const rarity = item.rarity || 'common';
+    if (rarity !== 'mythic' && rarity !== 'legendary' && rarity !== 'epic') {
+      resolve(); return;
+    }
+    const isMythic = rarity === 'mythic';
+    const isLeg = rarity === 'legendary';
+
+    if (isMythic) document.body.classList.add('mythic-alert', 'screen-shake');
+    else document.body.classList.add('screen-shake');
+
+    const overlay = document.createElement('div');
+    overlay.className = 'mythic-overlay' + (isMythic ? ' sirens' : '');
+    const label = isMythic ? '🚨 MYTHIC DROP 🚨' : isLeg ? '⚡ LEGENDARY' : '✨ EPIC';
+    const imgHtml = item.img
+      ? '<img src="' + item.img + '" alt="' + item.name + '" onerror="this.parentNode.innerHTML=\'<span style=font-size:4rem>\' + \'' + (item.emoji||'🎁') + '\' + \'</span>\'">'
+      : '<span style="font-size:4rem">' + (item.emoji||'🎁') + '</span>';
+
+    overlay.innerHTML =
+      '<div class="mythic-burst"></div>' +
+      '<div class="mythic-card ' + rarity + '">' +
+        '<div class="mythic-label">' + label + '</div>' +
+        '<div class="mythic-img-wrap" style="color:var(--r-' + rarity + ')">' + imgHtml + '</div>' +
+        '<div class="mythic-name">' + item.name + '</div>' +
+        '<div class="mythic-val">' + (item.value||0).toFixed(2) + ' TON</div>' +
+        '<button class="btn btn-primary" id="mythic-ok">Забрать!</button>' +
+      '</div>';
+    document.body.appendChild(overlay);
+
+    // Confetti
+    const colors = isMythic ? ['#ef4444','#a855f7','#f59e0b','#fff'] : isLeg ? ['#f59e0b','#fbbf24','#fff'] : ['#a855f7','#c084fc','#fff'];
+    for (let i = 0; i < (isMythic ? 40 : 20); i++) {
+      const p = document.createElement('div');
+      p.className = 'confetti-piece';
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.top = (-10 - Math.random() * 20) + 'vh';
+      p.style.background = colors[i % colors.length];
+      p.style.animationDelay = (Math.random() * 0.5) + 's';
+      p.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 4000);
+    }
+
+    // Optional Web Audio siren for mythic (no external file)
+    if (isMythic && window.AudioContext) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const playBeep = (freq, t, dur) => {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
+          o.frequency.value = freq;
+          g.gain.setValueAtTime(0.08, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+          o.start(t); o.stop(t + dur);
+        };
+        const now = ctx.currentTime;
+        for (let i = 0; i < 6; i++) {
+          playBeep(i % 2 === 0 ? 880 : 660, now + i * 0.18, 0.15);
+        }
+      } catch (e) {}
+    }
+
+    const close = () => {
+      overlay.remove();
+      document.body.classList.remove('mythic-alert', 'screen-shake');
+      resolve();
+    };
+    overlay.querySelector('#mythic-ok').addEventListener('click', close);
+    // auto close mythic after 8s if not clicked
+    setTimeout(close, isMythic ? 9000 : 5000);
+  });
+}
+window.playRareDropCeremony = playRareDropCeremony;
+
+
+
+function ensureLiveFeed() {
+  let f = document.getElementById('live-feed');
+  if (!f) {
+    f = document.createElement('div');
+    f.id = 'live-feed';
+    f.className = 'live-feed';
+    document.body.appendChild(f);
+  }
+  return f;
+}
+function pushLiveWin(item, who) {
+  const f = ensureLiveFeed();
+  const el = document.createElement('div');
+  el.className = 'live-toast';
+  el.innerHTML = '<span class="lt-emoji">' + (item.emoji||'🎁') + '</span><div><div class="lt-name">' + item.name + '</div><div class="lt-meta">' + (who||'Игрок') + ' · ' + (item.rarity||'') + '</div></div>';
+  f.prepend(el);
+  setTimeout(() => el.remove(), 4000);
+  while (f.children.length > 5) f.lastChild.remove();
+}
+
+
 // AUTH TABS
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -478,7 +578,7 @@ function openCase(caseId) {
   // Odds list
   const odds = getItemChances(caseId);
   document.getElementById('case-odds-list').innerHTML = odds.map(i =>
-    `<div class="odds-item rarity-${i.rarity}"><span class="oe">${i.emoji}</span><div class="on">${i.name}</div><div class="oc">${i.chance.toFixed(2)}% · ${i.value} TON</div></div>`
+    '<div class="odds-item rarity-' + i.rarity + '">' + (typeof itemVisual==='function'?itemVisual(i):'<span class="oe">'+i.emoji+'</span>') + '<div class="on">' + i.name + '</div><div class="oc">' + i.chance.toFixed(2) + '% · ' + i.value + ' TON</div></div>'
   ).join('');
   updateMultiPrice();
   document.getElementById('spin-modal').classList.remove('hidden');
@@ -516,7 +616,7 @@ function renderRoulette(items) {
 /** Accurate centering: measure real item width including gap */
 function buildTrackHTML(items) {
   return items.map(item =>
-    '<div class="roulette-item rarity-' + item.rarity + '"><span class="emoji">' + item.emoji + '</span><span class="name">' + item.name + '</span></div>'
+    '<div class="roulette-item rarity-' + item.rarity + '">' + (typeof itemVisual==='function'?itemVisual(item):'<span class="emoji">'+item.emoji+'</span>') + '<span class="name">' + item.name + '</span></div>'
   ).join('');
 }
 
@@ -577,9 +677,14 @@ document.getElementById('spin-btn').addEventListener('click', async () => {
   isSpinning = false;
   document.getElementById('case-spin-phase').classList.add('hidden');
   document.getElementById('results-list').innerHTML = pendingWins.map(w =>
-    '<div class="result-card rarity-' + w.rarity + '"><div class="re">' + w.emoji + '</div><div class="rn">' + w.name + '</div><div class="rarity ' + w.rarity + '">' + w.rarity + '</div><div class="rv">' + w.value.toFixed(2) + ' TON</div></div>'
+    '<div class="result-card rarity-' + w.rarity + '">' + (typeof itemVisual==='function'?itemVisual(w):'<div class="re">'+w.emoji+'</div>') + '<div class="rn">' + w.name + '</div><div class="rarity ' + w.rarity + '">' + w.rarity + '</div><div class="rv">' + w.value.toFixed(2) + ' TON</div></div>'
   ).join('');
+  pendingWins.forEach(w => { if (w.rarity==='legendary'||w.rarity==='mythic'||w.rarity==='epic') pushLiveWin(w, userData.username); });
   document.getElementById('spin-result').classList.remove('hidden');
+  // Ceremony for best drop (mythic > legendary > epic)
+  const rank = { mythic: 3, legendary: 2, epic: 1 };
+  const best = pendingWins.slice().sort((a,b) => (rank[b.rarity]||0) - (rank[a.rarity]||0))[0];
+  if (best && rank[best.rarity]) await playRareDropCeremony(best);
 });
 
 document.getElementById('claim-btn').addEventListener('click', async () => {
@@ -610,7 +715,7 @@ function renderInventory() {
   const inv = userData.inventory || [];
   if (!inv.length) { g.innerHTML = '<p class="empty-state">Пока пусто</p>'; return; }
   g.innerHTML = inv.map((i, idx) =>
-    `<div class="inv-item"><span class="emoji">${i.emoji}</span><div class="name">${i.name}</div><div class="rarity ${i.rarity}">${i.rarity}</div><div style="color:var(--accent);font-size:0.75rem;margin-top:4px">${(i.value||0).toFixed(2)} TON</div><button class="btn-sell" data-idx="${idx}">Продать</button></div>`
+    '<div class="inv-item">' + (typeof itemVisual==='function'?itemVisual(i):'<span class="emoji">'+i.emoji+'</span>') + '<div class="name">' + i.name + '</div><div class="rarity ' + i.rarity + '">' + i.rarity + '</div><div style="color:var(--accent);font-size:0.75rem;margin-top:4px">' + (i.value||0).toFixed(2) + ' TON</div><button class="btn-sell" data-idx="' + idx + '">Продать</button></div>'
   ).join('');
   g.querySelectorAll('.btn-sell').forEach(btn => {
     btn.addEventListener('click', () => sellItem(parseInt(btn.dataset.idx, 10)));
@@ -635,7 +740,7 @@ async function sellItem(idx) {
 function renderHistory() {
   const l = document.getElementById('history-list');
   const h = userData.history || [];
-  l.innerHTML = h.length ? h.map(i => `<div class="history-item"><span class="emoji">${i.emoji}</span><div class="info"><div class="name">${i.name}</div><div class="meta">${i.caseName||''} · ${fmtDate(i.wonAt)}</div></div><div class="value">${(i.value||0).toFixed(2)} TON</div></div>`).join('') : '<p class="empty-state">Пусто</p>';
+  l.innerHTML = h.length ? h.map(i => '<div class="history-item"><span class="emoji" style="font-size:1.6rem">' + i.emoji + '</span><div class="info"><div class="name">' + i.name + '</div><div class="meta">' + (i.caseName||'') + ' · ' + fmtDate(i.wonAt) + '</div></div><div class="value">' + (i.value||0).toFixed(2) + ' TON</div></div>').join('') : '<p class="empty-state">Пусто</p>';
 }
 function fmtTs(ts) {
   if (!ts) return '';
