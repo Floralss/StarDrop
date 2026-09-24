@@ -651,7 +651,7 @@ function openCase(caseId) {
   if (pp) pp.textContent = c.price.toFixed(2);
   const img = document.getElementById('preview-chest-img');
   if (img) {
-    img.src = caseId === 'nft' ? 'assets/cases/chest-nft.svg' : caseId === 'bear' ? 'assets/cases/chest-bear.svg' : 'assets/cases/chest-mecha.svg';
+    img.src = caseId === 'nft' ? 'assets/cases/chest-nft.png' : caseId === 'bear' ? 'assets/cases/chest-bear.png' : 'assets/cases/chest-mecha.png';
   }
   const chest = document.getElementById('preview-chest');
   if (chest) chest.className = 'chest-img-wrap big ' + (caseId === 'nft' ? 'nft-glow' : caseId === 'bear' ? 'bear-glow' : 'mecha-glow');

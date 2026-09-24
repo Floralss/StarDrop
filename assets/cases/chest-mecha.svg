@@ -1,31 +1,45 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 200" width="220" height="200">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 280" width="280" height="280">
   <defs>
-    <linearGradient id="b" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#2e1f5c"/><stop offset="100%" stop-color="#140e2a"/>
+    <linearGradient id="mg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#241848"/><stop offset="50%" stop-color="#120c28"/><stop offset="100%" stop-color="#080510"/>
     </linearGradient>
-    <linearGradient id="l" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#2e1f5c"/>
+    <linearGradient id="ml" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3a2870"/><stop offset="100%" stop-color="#1e1440"/>
     </linearGradient>
-    <filter id="glow"><feGaussianBlur stdDeviation="6" result="x"/><feMerge><feMergeNode in="x"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-    <filter id="soft"><feGaussianBlur stdDeviation="12"/></filter>
+    <filter id="mglow"><feGaussianBlur stdDeviation="8"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="msoft"><feGaussianBlur stdDeviation="16"/></filter>
+    <radialGradient id="mfloor" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.5"/><stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+    </radialGradient>
   </defs>
-  <ellipse cx="110" cy="185" rx="80" ry="12" fill="#8b5cf6" opacity="0.45" filter="url(#soft)"/>
-  <!-- body -->
-  <rect x="40" y="78" width="140" height="92" rx="14" fill="url(#b)" stroke="#a78bfa" stroke-width="2.5"/>
-  <rect x="50" y="88" width="120" height="72" rx="8" fill="#0a0a12" opacity="0.4"/>
-  <!-- lock -->
-  <rect x="95" y="112" width="30" height="26" rx="5" fill="#2e1f5c" stroke="#a78bfa" stroke-width="1.5"/>
-  <circle cx="110" cy="122" r="5" fill="#ddd6fe"/>
-  <rect x="107.5" y="122" width="5" height="9" rx="1" fill="#ddd6fe" opacity="0.8"/>
-  <!-- lid -->
-  <path d="M35 80 Q110 42 185 80 L172 88 Q110 56 48 88 Z" fill="url(#l)" stroke="#a78bfa" stroke-width="2.5"/>
-  <path d="M48 80 Q110 52 172 80" fill="none" stroke="#ddd6fe" stroke-width="1.2" opacity="0.35"/>
-  <!-- brand name -->
-  <text x="110" y="158" text-anchor="middle" fill="#ddd6fe" font-family="system-ui,Arial,sans-serif" font-size="13" font-weight="800" letter-spacing="1">MECHAGRAM</text>
-  <!-- floating gift icons -->
-  <g filter="url(#glow)" font-size="18">
-    <text x="48" y="58">⚙️</text>
-    <text x="95" y="48">🤖</text>
-    <text x="145" y="55">💠</text>
+  <ellipse cx="140" cy="255" rx="115" ry="20" fill="url(#mfloor)" filter="url(#msoft)"/>
+  <rect x="48" y="110" width="184" height="120" rx="16" fill="url(#mg)" stroke="#5b3d9e" stroke-width="3"/>
+  <!-- tech lines -->
+  <path d="M65 145 H100 M180 145 H215 M65 175 H95 M185 175 H215" stroke="#7c5cff" stroke-width="1.5" opacity="0.4"/>
+  <rect x="48" y="125" width="184" height="8" fill="#1a1040" stroke="#6d4ec9" stroke-width="1"/>
+  <rect x="48" y="205" width="184" height="8" fill="#1a1040" stroke="#6d4ec9" stroke-width="1"/>
+  <rect x="118" y="155" width="44" height="40" rx="6" fill="#2a1a50" stroke="#a78bfa" stroke-width="2"/>
+  <circle cx="140" cy="172" r="8" fill="none" stroke="#c4b5fd" stroke-width="2.5"/>
+  <rect x="136" y="172" width="8" height="12" rx="1" fill="#c4b5fd"/>
+  <path d="M45 115 Q140 55 235 115 L220 125 Q140 75 60 125 Z" fill="url(#ml)" stroke="#6d4ec9" stroke-width="3"/>
+  <path d="M60 115 Q140 70 220 115" fill="none" stroke="#a78bfa" stroke-width="2" opacity="0.4"/>
+  <ellipse cx="140" cy="112" rx="12" ry="5" fill="#3a2870" stroke="#a78bfa"/>
+  <rect x="90" y="188" width="100" height="22" rx="4" fill="#0c0818" stroke="#6d4ec9" stroke-width="1.5"/>
+  <text x="140" y="204" text-anchor="middle" fill="#c4b5fd" font-family="Arial Black,Arial,sans-serif" font-size="10" font-weight="900" letter-spacing="1">MECHAGRAM</text>
+  <g filter="url(#mglow)">
+    <!-- robot head -->
+    <rect x="120" y="58" width="40" height="32" rx="6" fill="#3b82f6"/>
+    <circle cx="132" cy="72" r="5" fill="#22d3ee"/>
+    <circle cx="148" cy="72" r="5" fill="#22d3ee"/>
+    <rect x="134" y="82" width="12" height="4" rx="1" fill="#1e293b"/>
+    <!-- gear -->
+    <circle cx="90" cy="80" r="14" fill="none" stroke="#a78bfa" stroke-width="3"/>
+    <circle cx="90" cy="80" r="5" fill="#c4b5fd"/>
+    <path d="M90 62 L90 66 M90 94 L90 98 M72 80 L76 80 M104 80 L108 80" stroke="#a78bfa" stroke-width="3"/>
+    <!-- crystal -->
+    <path d="M185 70 L195 55 L205 70 L195 88 Z" fill="#67e8f9" opacity="0.9"/>
+    <path d="M195 55 L195 88" stroke="#fff" stroke-width="1" opacity="0.4"/>
+    <!-- diamond -->
+    <path d="M175 95 L182 85 L189 95 L182 105 Z" fill="#a78bfa"/>
   </g>
 </svg>
