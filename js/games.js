@@ -141,19 +141,20 @@ const RocketGame = {
 
 // Catalog of upgrade targets (gifts you can aim for)
 const UPGRADE_TARGETS = [
-  { id: 't_fluffy', name: 'Fluffy Bear', emoji: '🐻‍❄️', rarity: 'uncommon', value: 0.35 },
-  { id: 't_box', name: 'Gift Box', emoji: '🎁', rarity: 'uncommon', value: 0.5 },
-  { id: 't_stars50', name: '50 Stars', emoji: '🌟', rarity: 'uncommon', value: 0.5 },
-  { id: 't_white', name: 'White Plush Bear', emoji: '🤍🧸', rarity: 'rare', value: 1.5 },
-  { id: 't_nft_c', name: 'NFT Common', emoji: '💎', rarity: 'rare', value: 2.5 },
-  { id: 't_stars100', name: '100 Stars', emoji: '💫', rarity: 'rare', value: 1.0 },
-  { id: 't_nft_r', name: 'NFT Rare', emoji: '💠', rarity: 'epic', value: 8.0 },
-  { id: 't_bear_nft', name: 'NFT White Bear', emoji: '🐻‍❄️✨', rarity: 'epic', value: 8.0 },
-  { id: 't_mecha', name: 'Mecha Part', emoji: '⚙️', rarity: 'epic', value: 6.0 },
-  { id: 't_nft_e', name: 'NFT Epic', emoji: '🔮', rarity: 'legendary', value: 25.0 },
-  { id: 't_suit', name: 'Full Mecha Suit', emoji: '🤖', rarity: 'legendary', value: 40.0 },
-  { id: 't_nft_l', name: 'NFT Legendary', emoji: '👑', rarity: 'mythic', value: 80.0 },
-  { id: 't_myth', name: 'NFT Mythic', emoji: '🕶️', rarity: 'mythic', value: 200.0 }
+  { id: 't_gift_box', name: 'Gift Box', emoji: '🎁', rarity: 'uncommon', value: 0.5 },
+  { id: 't_gem', name: 'Gem', emoji: '💎', rarity: 'uncommon', value: 0.8 },
+  { id: 't_toy_bear', name: 'Toy Bear', emoji: '🐻', rarity: 'rare', value: 2.5 },
+  { id: 't_scared_cat', name: 'Scared Cat', emoji: '😿', rarity: 'rare', value: 3.5 },
+  { id: 't_loot_bag', name: 'Loot Bag', emoji: '🛍️', rarity: 'rare', value: 5.0 },
+  { id: 't_ion_gem', name: 'Ion Gem', emoji: '💠', rarity: 'epic', value: 12.0 },
+  { id: 't_mini_oscar', name: 'Mini Oscar', emoji: '🏆', rarity: 'epic', value: 15.0 },
+  { id: 't_swiss', name: 'Swiss Watch', emoji: '⌚', rarity: 'epic', value: 20.0 },
+  { id: 't_helmet', name: 'Heroic Helmet', emoji: '⛑️', rarity: 'legendary', value: 30.0 },
+  { id: 't_locket', name: 'Heart Locket', emoji: '💟', rarity: 'legendary', value: 40.0 },
+  { id: 't_cap', name: "Durov's Cap", emoji: '🧢', rarity: 'legendary', value: 55.0 },
+  { id: 't_peach', name: 'Precious Peach', emoji: '🍑', rarity: 'mythic', value: 80.0 },
+  { id: 't_pepe', name: 'Plush Pepe', emoji: '🐸', rarity: 'mythic', value: 150.0 },
+  { id: 't_glasses', name: "Durov's Glasses", emoji: '🕶️', rarity: 'mythic', value: 300.0 }
 ];
 
 const GiftUpgrade = {

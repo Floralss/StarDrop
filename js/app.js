@@ -127,6 +127,27 @@ async function setBalance(newBal) {
 document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
 
 // NAV
+document.querySelectorAll('.mnav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mnav-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.page === btn.dataset.page);
+    });
+    const page = btn.dataset.page;
+    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+    const el = document.getElementById('page-' + page);
+    if (el) el.classList.remove('hidden');
+    if (page === 'admin' && isAdmin) loadAdminRequests();
+    if (page === 'requests') loadUserRequests();
+    if (page === 'leaderboard') loadLeaderboard();
+    if (page === 'games') {
+      document.getElementById('games-menu').classList.remove('hidden');
+      document.querySelectorAll('.game-view').forEach(v => v.classList.remove('active'));
+    }
+  });
+});
+
 document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -493,40 +514,44 @@ function renderRoulette(items) {
 }
 
 /** Accurate centering: measure real item width including gap */
-function spinOnceToWinner(winner) {
+function buildTrackHTML(items) {
+  return items.map(item =>
+    '<div class="roulette-item rarity-' + item.rarity + '"><span class="emoji">' + item.emoji + '</span><span class="name">' + item.name + '</span></div>'
+  ).join('');
+}
+
+function spinAllSimultaneous(winners) {
   return new Promise(resolve => {
-    const { items, winIndex } = generateRouletteItems(currentCase, winner, 60);
-    renderRoulette(items);
-    const track = document.getElementById('roulette-track');
-    const container = track.parentElement;
-    // Force layout
-    track.offsetHeight;
-    const firstItem = track.querySelector('.roulette-item');
-    if (!firstItem) { resolve(); return; }
-    const style = getComputedStyle(track);
-    const gap = parseFloat(style.gap) || 8;
-    const itemW = firstItem.offsetWidth + gap;
-    // padding-left is 50% of container — center of item should land under pointer (center of container)
-    // offset to move winIndex item center to container center:
-    // position of item center from start of content = winIndex * itemW + itemW/2
-    // but track has padding-left = 50% of container width
-    // transform translateX moves the track; we want:
-    // containerWidth/2 = paddingLeft + winIndex*itemW + itemW/2 + translateX
-    // paddingLeft = containerWidth/2, so:
-    // 0 = winIndex*itemW + itemW/2 + translateX
-    // translateX = -(winIndex * itemW + itemW/2)
-    // Wait: with padding 50%, the first item starts at container center when translateX=0.
-    // So item at index 0 center is at: containerCenter + itemW/2 - wait
-    // Actually items start after padding. First item left edge at padding (= center of container).
-    // Center of item 0 = padding + itemW/2 = containerW/2 + itemW/2
-    // Center of item i = containerW/2 + i*itemW + itemW/2
-    // We want center of item i at containerW/2, so translateX = -(i*itemW + itemW/2)
-    const dist = winIndex * itemW + firstItem.offsetWidth / 2;
-    track.style.transition = 'transform 4.8s cubic-bezier(0.12, 0.85, 0.2, 1)';
-    track.style.transform = 'translateX(-' + dist + 'px)';
-    setTimeout(resolve, 5000);
+    const wrap = document.getElementById('multi-roulettes');
+    wrap.innerHTML = '';
+    const rows = [];
+    winners.forEach((winner, i) => {
+      const { items, winIndex } = generateRouletteItems(currentCase, winner, 50);
+      const row = document.createElement('div');
+      row.className = 'multi-roulette-row';
+      row.innerHTML = '<div class="roulette-pointer"></div><div class="roulette-track">' + buildTrackHTML(items) + '</div>';
+      wrap.appendChild(row);
+      rows.push({ row, track: row.querySelector('.roulette-track'), winIndex, items });
+    });
+
+    // Force layout then animate all at once
+    wrap.offsetHeight;
+    rows.forEach(({ track, winIndex }) => {
+      const first = track.querySelector('.roulette-item');
+      if (!first) return;
+      const gap = parseFloat(getComputedStyle(track).gap) || 6;
+      const itemW = first.offsetWidth + gap;
+      const dist = winIndex * itemW + first.offsetWidth / 2;
+      track.style.transition = 'none';
+      track.style.transform = 'translateX(0)';
+      track.offsetHeight;
+      track.style.transition = 'transform 4.5s cubic-bezier(0.12, 0.85, 0.2, 1)';
+      track.style.transform = 'translateX(-' + dist + 'px)';
+    });
+    setTimeout(resolve, 4700);
   });
 }
+
 
 document.getElementById('spin-btn').addEventListener('click', async () => {
   if (isSpinning || !currentCase) return;
@@ -538,28 +563,21 @@ document.getElementById('spin-btn').addEventListener('click', async () => {
   try {
     await setBalance(userData.balance - totalCost);
   } catch (e) {
-    isSpinning = false; document.getElementById('spin-btn').disabled = false;
+    isSpinning = false;
+    document.getElementById('spin-btn').disabled = false;
     return showToast('Ошибка', 'error');
   }
-
   document.getElementById('case-preview').classList.add('hidden');
   document.getElementById('case-spin-phase').classList.remove('hidden');
   document.getElementById('spin-result').classList.add('hidden');
   pendingWins = [];
-
-  for (let i = 0; i < multiCount; i++) {
-    document.getElementById('spin-progress').textContent = multiCount > 1 ? ('Открытие ' + (i+1) + ' / ' + multiCount) : 'Крутим...';
-    const winner = rollItem(currentCase);
-    pendingWins.push(winner);
-    await spinOnceToWinner(winner);
-  }
-
+  for (let i = 0; i < multiCount; i++) pendingWins.push(rollItem(currentCase));
+  document.getElementById('spin-progress').textContent = multiCount > 1 ? ('Крутим x' + multiCount + '…') : 'Крутим…';
+  await spinAllSimultaneous(pendingWins);
   isSpinning = false;
   document.getElementById('case-spin-phase').classList.add('hidden');
-  // Show results
-  const list = document.getElementById('results-list');
-  list.innerHTML = pendingWins.map(w =>
-    `<div class="result-card rarity-${w.rarity}"><div class="re">${w.emoji}</div><div class="rn">${w.name}</div><div class="rarity ${w.rarity}">${w.rarity}</div><div class="rv">${w.value.toFixed(2)} TON</div></div>`
+  document.getElementById('results-list').innerHTML = pendingWins.map(w =>
+    '<div class="result-card rarity-' + w.rarity + '"><div class="re">' + w.emoji + '</div><div class="rn">' + w.name + '</div><div class="rarity ' + w.rarity + '">' + w.rarity + '</div><div class="rv">' + w.value.toFixed(2) + ' TON</div></div>'
   ).join('');
   document.getElementById('spin-result').classList.remove('hidden');
 });

@@ -71,7 +71,7 @@
 
     <main id="page-cases" class="page">
       <section class="hero">
-        <h1>Открывай кейсы — получай подарки</h1>
+        <h1>1GIFT-style кейсы Telegram</h1>
         <p>Звёзды, мишки, NFT и коллекционные подарки Telegram. Баланс в TON.</p>
       </section>
       <div class="cases-grid">
@@ -302,10 +302,7 @@
 
       <!-- Roulette phase -->
       <div id="case-spin-phase" class="hidden">
-        <div class="roulette-container">
-          <div class="roulette-pointer"></div>
-          <div class="roulette-track" id="roulette-track"></div>
-        </div>
+        <div id="multi-roulettes" class="multi-roulettes"></div>
         <p class="spin-progress" id="spin-progress"></p>
       </div>
 
@@ -340,6 +337,14 @@
       <button class="btn btn-ghost" id="close-withdraw" style="margin-top:10px;width:100%">Закрыть</button>
     </div>
   </div>
+
+  <nav id="mobile-nav" class="mobile-nav">
+    <button class="mnav-btn active" data-page="cases"><span>🎁</span>Кейсы</button>
+    <button class="mnav-btn" data-page="games"><span>🎮</span>Игры</button>
+    <button class="mnav-btn" data-page="leaderboard"><span>🏆</span>Топ</button>
+    <button class="mnav-btn" data-page="inventory"><span>🎒</span>Инв.</button>
+    <button class="mnav-btn" data-page="requests"><span>📋</span>Заявки</button>
+  </nav>
 
   <div id="toast" class="toast hidden"></div>
   <script src="js/firebase.js"></script>

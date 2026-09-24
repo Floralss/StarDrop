@@ -811,3 +811,72 @@ body {
 
 /* Leaderboard empty polish */
 .lb-list .empty-state { padding: 40px; }
+
+/* Multi simultaneous roulettes */
+.multi-roulettes { display: flex; flex-direction: column; gap: 10px; }
+.multi-roulette-row {
+  position: relative; height: 100px; overflow: hidden;
+  border-radius: 12px; background: var(--bg-elevated); border: 1px solid var(--border);
+}
+.multi-roulette-row .roulette-pointer {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 2px; height: 100%; background: var(--primary); z-index: 10;
+  box-shadow: 0 0 10px var(--primary);
+}
+.multi-roulette-row .roulette-track {
+  display: flex; height: 100%; align-items: center; gap: 6px; padding: 0 50%;
+}
+.multi-roulette-row .roulette-item {
+  width: 80px; height: 80px; flex-shrink: 0;
+  border-radius: 10px; border: 2px solid var(--border);
+  background: var(--bg-card); display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 2px;
+}
+.multi-roulette-row .roulette-item .emoji { font-size: 1.6rem; }
+.multi-roulette-row .roulette-item .name { font-size: 0.55rem; color: var(--text-muted); max-width: 90%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Mobile bottom nav — 1GIFT style */
+.mobile-nav {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(15, 17, 26, 0.95);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+  z-index: 200;
+  justify-content: space-around;
+}
+.mnav-btn {
+  flex: 1; background: none; border: none; color: var(--text-muted);
+  font-size: 0.65rem; font-weight: 600; padding: 6px 2px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  cursor: pointer; border-radius: 10px;
+}
+.mnav-btn span { font-size: 1.25rem; }
+.mnav-btn.active { color: var(--primary); background: var(--primary-dim); }
+
+@media (max-width: 768px) {
+  .mobile-nav { display: flex; }
+  .nav { display: none; }
+  .page { padding-bottom: 80px; }
+  .header { padding: 10px 12px; }
+  .logo { font-size: 1.1rem; }
+  .btn-deposit, .btn-withdraw { padding: 8px 12px; font-size: 0.8rem; }
+  .user-menu .btn-ghost { display: none; }
+  .cases-grid { gap: 14px; }
+  .case-visual { height: 160px; }
+  .hero h1 { font-size: 1.35rem; }
+  .cs-upgrade-layout { grid-template-columns: 1fr; }
+  .spin-content { max-width: 100%; padding: 16px; }
+  .odds-list { grid-template-columns: repeat(3, 1fr); max-height: 160px; }
+  .multi-roulette-row { height: 88px; }
+  .multi-roulette-row .roulette-item { width: 70px; height: 70px; }
+}
+
+/* 1GIFT-like case card polish */
+.case-card .case-info h3 { font-size: 1.05rem; }
+.case-badge-free {
+  display: inline-block; background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white; font-size: 0.7rem; font-weight: 800; padding: 3px 8px;
+  border-radius: 6px; margin-left: 6px; vertical-align: middle;
+}
