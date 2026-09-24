@@ -29,6 +29,12 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
+  background-image: url('../assets/bg-main.png'),
+    radial-gradient(ellipse 90% 60% at 50% -15%, rgba(124, 92, 255, 0.28), transparent),
+    radial-gradient(ellipse 50% 40% at 100% 20%, rgba(168, 85, 247, 0.12), transparent);
+  background-size: cover, auto, auto;
+  background-attachment: fixed;
+
   font-family: var(--font);
   background: var(--bg);
   color: var(--text);
@@ -250,6 +256,12 @@ body {
 .mecha-case .case-glow { background: var(--mecha); }
 
 .case-body {
+  background-image: url('../assets/bg-main.png'),
+    radial-gradient(ellipse 90% 60% at 50% -15%, rgba(124, 92, 255, 0.28), transparent),
+    radial-gradient(ellipse 50% 40% at 100% 20%, rgba(168, 85, 247, 0.12), transparent);
+  background-size: cover, auto, auto;
+  background-attachment: fixed;
+
   position: relative; z-index: 2;
   width: 130px; height: 110px;
   animation: floatCase 4s ease-in-out infinite;
@@ -893,6 +905,12 @@ body {
 
 /* Stronger ambient glow */
 body {
+  background-image: url('../assets/bg-main.png'),
+    radial-gradient(ellipse 90% 60% at 50% -15%, rgba(124, 92, 255, 0.28), transparent),
+    radial-gradient(ellipse 50% 40% at 100% 20%, rgba(168, 85, 247, 0.12), transparent);
+  background-size: cover, auto, auto;
+  background-attachment: fixed;
+
   background-image:
     radial-gradient(ellipse 90% 60% at 50% -15%, rgba(124, 92, 255, 0.28), transparent),
     radial-gradient(ellipse 50% 40% at 100% 20%, rgba(168, 85, 247, 0.12), transparent),
@@ -1443,4 +1461,13 @@ body.mythic-alert {
   transform: scale(1.12);
   box-shadow: 0 0 16px rgba(124,92,255,0.5);
   border: 1px solid var(--primary);
+}
+
+.chest-img-wrap { width: 180px !important; height: 180px !important; }
+.chest-img-wrap.big { width: 220px !important; height: 220px !important; }
+.chest-img { image-rendering: auto; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.4)); }
+.case-card.gift-style {
+  background: rgba(18, 20, 30, 0.85) !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08) !important;
 }
