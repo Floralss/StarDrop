@@ -1506,3 +1506,37 @@ body {
   background-attachment: fixed, fixed !important;
   background-blend-mode: normal, normal !important;
 }
+
+
+/* Clean photoreal chests - no white bars */
+.chest-img-wrap {
+  width: 100% !important;
+  max-width: 220px !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+  margin: 0 auto 12px !important;
+  background: #000 !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+.chest-img-wrap.big {
+  max-width: 260px !important;
+}
+.chest-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  display: block !important;
+  background: #000 !important;
+}
+.case-card.gift-style {
+  overflow: hidden !important;
+  background: #12141c !important;
+}
+.case-card.gift-style .chest-img-wrap {
+  filter: none !important;
+}
+.nft-glow, .bear-glow, .mecha-glow {
+  filter: none !important;
+}
