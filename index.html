@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StarDrop — Кейсы Telegram Подарков</title>
+  <title>StarDrop — Кейсы & Мини-игры</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="assets/icons/logo.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
@@ -13,12 +14,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
-  <div id="loading" class="loading-overlay">
-    <div class="loader"></div>
-    <p>Загрузка...</p>
-  </div>
+  <div id="loading" class="loading-overlay"><div class="loader"></div><p>Загрузка StarDrop...</p></div>
 
-  <!-- Auth Modal -->
   <div id="auth-modal" class="modal hidden">
     <div class="modal-content auth-content">
       <div class="auth-tabs">
@@ -26,45 +23,26 @@
         <button class="tab" data-tab="register">Регистрация</button>
       </div>
       <form id="login-form" class="auth-form">
-        <h2>Вход в аккаунт</h2>
-        <div class="input-group">
-          <label>Email</label>
-          <input type="email" id="login-email" required placeholder="you@email.com">
-        </div>
-        <div class="input-group">
-          <label>Пароль</label>
-          <input type="password" id="login-password" required placeholder="••••••••">
-        </div>
+        <h2>Вход</h2>
+        <div class="input-group"><label>Email</label><input type="email" id="login-email" required placeholder="you@email.com"></div>
+        <div class="input-group"><label>Пароль</label><input type="password" id="login-password" required placeholder="••••••••"></div>
         <button type="submit" class="btn btn-primary">Войти</button>
         <p class="auth-error" id="login-error"></p>
       </form>
       <form id="register-form" class="auth-form hidden">
         <h2>Регистрация</h2>
-        <div class="input-group">
-          <label>Telegram Username</label>
-          <input type="text" id="reg-username" required placeholder="@username" pattern="^@?[a-zA-Z0-9_]{5,32}$">
-        </div>
-        <div class="input-group">
-          <label>Email</label>
-          <input type="email" id="reg-email" required placeholder="you@email.com">
-        </div>
-        <div class="input-group">
-          <label>Пароль</label>
-          <input type="password" id="reg-password" required placeholder="Минимум 6 символов" minlength="6">
-        </div>
+        <div class="input-group"><label>Telegram Username</label><input type="text" id="reg-username" required placeholder="@username" pattern="^@?[a-zA-Z0-9_]{5,32}$"></div>
+        <div class="input-group"><label>Email</label><input type="email" id="reg-email" required placeholder="you@email.com"></div>
+        <div class="input-group"><label>Пароль</label><input type="password" id="reg-password" required placeholder="Мин. 6 символов" minlength="6"></div>
         <button type="submit" class="btn btn-primary">Создать аккаунт</button>
         <p class="auth-error" id="reg-error"></p>
       </form>
     </div>
   </div>
 
-  <!-- Main App -->
   <div id="app" class="hidden">
     <header class="header">
-      <div class="logo">
-        <span class="logo-icon">⭐</span>
-        <span class="logo-text">StarDrop</span>
-      </div>
+      <div class="logo"><img src="assets/icons/logo.svg" alt=""><span>StarDrop</span></div>
       <div class="header-right">
         <div class="balance-box">
           <span class="balance-label">Баланс</span>
@@ -83,69 +61,55 @@
 
     <nav class="nav">
       <button class="nav-btn active" data-page="cases">Кейсы</button>
+      <button class="nav-btn" data-page="games">Мини-игры</button>
+      <button class="nav-btn" data-page="leaderboard">Лидерборд</button>
       <button class="nav-btn" data-page="inventory">Инвентарь</button>
       <button class="nav-btn" data-page="history">История</button>
       <button class="nav-btn" data-page="requests">Мои заявки</button>
       <button class="nav-btn hidden" id="admin-nav-btn" data-page="admin">Админка</button>
     </nav>
 
-    <!-- Cases Page -->
     <main id="page-cases" class="page">
       <section class="hero">
-        <h1>Открывай кейсы — получай подарки Telegram</h1>
-        <p>Звёзды, мишки, NFT и редкие коллекционные подарки. Баланс в TON. Пополнение и вывод — по заявке.</p>
+        <h1>Открывай кейсы — получай подарки</h1>
+        <p>Звёзды, мишки, NFT и коллекционные подарки Telegram. Баланс в TON.</p>
       </section>
       <div class="cases-grid">
         <div class="case-card" data-case="nft">
-          <div class="case-visual nft-case">
-            <div class="case-glow"></div>
-            <div class="case-body">
-              <div class="case-lid"></div>
-              <div class="case-front">
-                <span class="case-emoji">💎</span>
-                <span class="case-title-small">NFT</span>
-              </div>
-            </div>
+          <div class="case-visual nft-case"><div class="case-glow"></div>
+            <div class="case-body"><div class="case-front-custom">
+              <img src="assets/icons/nft-case.svg" alt="NFT"><span class="case-label">NFT</span>
+            </div></div>
           </div>
           <div class="case-info">
             <h3>Кейс NFT</h3>
-            <p>Редкие NFT-подарки из Telegram. Шанс на легендарные и мифические предметы крайне низкий.</p>
+            <p>Редкие NFT из Telegram. Шанс на мифические — крайне низкий.</p>
             <div class="case-price"><span class="price">2.5</span> TON</div>
             <button class="btn btn-open" data-case="nft">Открыть</button>
           </div>
         </div>
         <div class="case-card" data-case="bear">
-          <div class="case-visual bear-case">
-            <div class="case-glow"></div>
-            <div class="case-body">
-              <div class="case-lid"></div>
-              <div class="case-front">
-                <span class="case-emoji">🧸</span>
-                <span class="case-title-small">МИШКА</span>
-              </div>
-            </div>
+          <div class="case-visual bear-case"><div class="case-glow"></div>
+            <div class="case-body"><div class="case-front-custom">
+              <img src="assets/icons/bear-case.svg" alt="Мишка"><span class="case-label">МИШКА</span>
+            </div></div>
           </div>
           <div class="case-info">
             <h3>Кейс Мишка</h3>
-            <p>Разные мишки из Telegram, сердечки и редкий белый пушистый NFT-медведь.</p>
+            <p>Мишки, сердечки и редкий белый пушистый NFT-медведь.</p>
             <div class="case-price"><span class="price">0.8</span> TON</div>
             <button class="btn btn-open" data-case="bear">Открыть</button>
           </div>
         </div>
         <div class="case-card" data-case="mecha">
-          <div class="case-visual mecha-case">
-            <div class="case-glow"></div>
-            <div class="case-body">
-              <div class="case-lid"></div>
-              <div class="case-front">
-                <span class="case-emoji">🤖</span>
-                <span class="case-title-small">MECHA</span>
-              </div>
-            </div>
+          <div class="case-visual mecha-case"><div class="case-glow"></div>
+            <div class="case-body"><div class="case-front-custom">
+              <img src="assets/cases/mecha-logo.png" alt="MechaGram" class="mecha-logo-img"><span class="case-label">MECHA</span>
+            </div></div>
           </div>
           <div class="case-info">
             <h3>Кейс MechaGram</h3>
-            <p>Всё, что только можно: звёзды, подарки, мишки, NFT и эксклюзивы. Максимальный вайб.</p>
+            <p>Всё подряд: звёзды, подарки, NFT и эксклюзивы MechaGram.</p>
             <div class="case-price"><span class="price">5.0</span> TON</div>
             <button class="btn btn-open" data-case="mecha">Открыть</button>
           </div>
@@ -153,24 +117,98 @@
       </div>
     </main>
 
-    <!-- Inventory Page -->
+    <main id="page-games" class="page hidden">
+      <h2 class="page-title">Мини-игры</h2>
+      <p class="page-hint">Мины, ракета, апгрейдер. Минимальная ставка на мины — 5 TON.</p>
+      <div id="games-menu">
+        <div class="games-grid">
+          <div class="game-card" data-game="mines">
+            <img src="assets/icons/mines.svg" alt=""><h3>Мины</h3>
+            <p>Открывай клетки, избегай бомб. Чем дальше — тем выше множитель.</p>
+            <span class="game-min">мин. 5 TON</span>
+          </div>
+          <div class="game-card" data-game="rocket">
+            <img src="assets/icons/rocket.svg" alt=""><h3>Ракета</h3>
+            <p>Ракета летит вверх. Забери выигрыш до взрыва.</p>
+            <span class="game-min">мин. 0.5 TON</span>
+          </div>
+          <div class="game-card" data-game="upgrade">
+            <img src="assets/icons/upgrade.svg" alt=""><h3>Апгрейдер</h3>
+            <p>Поставь сумму и шанс. Выиграл — множитель. Проиграл — 0.</p>
+            <span class="game-min">мин. 0.5 TON</span>
+          </div>
+        </div>
+      </div>
+      <div id="game-mines" class="game-view">
+        <button class="back-games" id="back-mines">← Назад к играм</button>
+        <h2 class="page-title">Мины</h2>
+        <div class="mines-panel">
+          <div class="mines-controls">
+            <div class="input-group"><label>Ставка (TON)</label><input type="number" id="mines-bet" min="5" step="0.5" value="5"></div>
+            <div class="input-group"><label>Бомбы</label>
+              <select id="mines-bombs"><option value="3">3</option><option value="5" selected>5</option><option value="8">8</option><option value="10">10</option></select>
+            </div>
+            <button class="btn btn-primary" id="mines-start" style="width:auto">Начать</button>
+          </div>
+          <div class="mines-info">
+            <span>Множитель: <span class="mines-mult" id="mines-mult">1.00x</span></span>
+            <span id="mines-profit">Прибыль: 0 TON</span>
+          </div>
+          <div class="mines-grid" id="mines-grid"></div>
+          <div class="mines-actions"><button class="btn btn-deposit hidden" id="mines-cashout">Забрать</button></div>
+        </div>
+      </div>
+      <div id="game-rocket" class="game-view">
+        <button class="back-games" id="back-rocket">← Назад к играм</button>
+        <h2 class="page-title">Ракета</h2>
+        <div class="rocket-panel">
+          <div class="rocket-visual">
+            <div class="rocket-mult-display" id="rocket-mult">1.00x</div>
+            <div class="rocket-ship" id="rocket-ship">🚀</div>
+          </div>
+          <div class="rocket-controls">
+            <div class="input-group"><label>Ставка (TON)</label><input type="number" id="rocket-bet" min="0.5" step="0.1" value="1"></div>
+            <button class="btn btn-primary" id="rocket-start">Запустить</button>
+            <button class="btn btn-deposit hidden" id="rocket-cashout">Забрать</button>
+          </div>
+        </div>
+      </div>
+      <div id="game-upgrade" class="game-view">
+        <button class="back-games" id="back-upgrade">← Назад к играм</button>
+        <h2 class="page-title">Апгрейдер</h2>
+        <div class="upgrade-panel">
+          <div class="input-group"><label>Ставка (TON)</label><input type="number" id="upgrade-bet" min="0.5" step="0.1" value="1"></div>
+          <div class="input-group"><label>Шанс успеха (%)</label>
+            <input type="range" id="upgrade-chance-range" min="5" max="75" value="45">
+            <span id="upgrade-chance-label">45%</span>
+          </div>
+          <div class="upgrade-bar-wrap">
+            <div class="upgrade-bar" id="upgrade-bar" style="width:45%"></div>
+            <div class="upgrade-chance" id="upgrade-chance-text">45% → x2.00</div>
+          </div>
+          <div class="upgrade-result" id="upgrade-result"></div>
+          <button class="btn btn-primary" id="upgrade-go">Апгрейд</button>
+        </div>
+      </div>
+    </main>
+
+    <main id="page-leaderboard" class="page hidden">
+      <h2 class="page-title">Лидерборд</h2>
+      <p class="page-hint">Топ игроков по балансу.</p>
+      <div id="lb-list" class="lb-list"><p class="empty-state">Загрузка...</p></div>
+    </main>
+
     <main id="page-inventory" class="page hidden">
-      <h2 class="page-title">Мой инвентарь</h2>
-      <p class="page-hint">Чтобы вывести предмет — создай заявку на вывод. Админ свяжется с тобой в Telegram.</p>
-      <div id="inventory-grid" class="inventory-grid">
-        <p class="empty-state">Пока пусто. Открой кейс!</p>
-      </div>
+      <h2 class="page-title">Инвентарь</h2>
+      <p class="page-hint">Вывод предмета — через заявку. Админ свяжется в Telegram.</p>
+      <div id="inventory-grid" class="inventory-grid"><p class="empty-state">Пока пусто</p></div>
     </main>
 
-    <!-- History Page -->
     <main id="page-history" class="page hidden">
-      <h2 class="page-title">История открытий</h2>
-      <div id="history-list" class="history-list">
-        <p class="empty-state">История пуста</p>
-      </div>
+      <h2 class="page-title">История</h2>
+      <div id="history-list" class="history-list"><p class="empty-state">История пуста</p></div>
     </main>
 
-    <!-- User Requests Page -->
     <main id="page-requests" class="page hidden">
       <h2 class="page-title">Мои заявки</h2>
       <div class="requests-tabs">
@@ -181,10 +219,33 @@
       <div id="user-withdrawals-list" class="requests-list hidden"></div>
     </main>
 
-    <!-- Admin Page -->
     <main id="page-admin" class="page hidden">
       <h2 class="page-title">Админ-панель</h2>
-      <p class="page-hint">Заявки на пополнение и вывод. После обработки напиши пользователю в Telegram (@username), чтобы выдать товар или подтвердить оплату.</p>
+      <p class="page-hint">Заявки + выдача TON и подарков по ID или @username.</p>
+      <div class="admin-give-box">
+        <h3>Выдать TON / подарок</h3>
+        <div class="admin-give-row">
+          <input type="text" id="give-target" placeholder="ID или @username">
+          <select id="give-type"><option value="ton">TON</option><option value="gift">Подарок</option></select>
+        </div>
+        <div class="admin-give-row" id="give-ton-row">
+          <input type="number" id="give-amount" min="0.1" step="0.1" placeholder="Сумма TON">
+          <button class="btn btn-approve" id="give-ton-btn">Выдать TON</button>
+        </div>
+        <div class="admin-give-row hidden" id="give-gift-row">
+          <select id="give-gift-select">
+            <option value="teddy|🧸|Teddy Bear|common|0.1">🧸 Teddy Bear</option>
+            <option value="heart|❤️|Love Heart|common|0.08">❤️ Love Heart</option>
+            <option value="stars50|🌟|50 Stars|uncommon|0.5">🌟 50 Stars</option>
+            <option value="nft_c|💎|NFT Common|rare|1.2">💎 NFT Common</option>
+            <option value="nft_r|💠|NFT Rare|epic|4.0">💠 NFT Rare</option>
+            <option value="white_bear|🤍🧸|White Plush Bear|rare|1.5">🤍🧸 White Bear</option>
+            <option value="nft_bear|🐻‍❄️✨|NFT White Fluffy Bear|epic|8.0">🐻‍❄️ NFT Bear</option>
+            <option value="mecha|🤖|Mecha Suit|legendary|40.0">🤖 Mecha Suit</option>
+          </select>
+          <button class="btn btn-approve" id="give-gift-btn">Выдать подарок</button>
+        </div>
+      </div>
       <div class="admin-tabs">
         <button class="admin-tab active" data-admin="deposits">Пополнения <span id="dep-count" class="badge">0</span></button>
         <button class="admin-tab" data-admin="withdrawals">Выводы <span id="wd-count" class="badge">0</span></button>
@@ -194,17 +255,10 @@
     </main>
   </div>
 
-  <!-- Spin Modal -->
   <div id="spin-modal" class="modal hidden">
     <div class="modal-content spin-content">
-      <div class="spin-header">
-        <h2 id="spin-case-name">Открытие кейса</h2>
-        <button class="close-btn" id="close-spin">×</button>
-      </div>
-      <div class="roulette-container">
-        <div class="roulette-pointer"></div>
-        <div class="roulette-track" id="roulette-track"></div>
-      </div>
+      <div class="spin-header"><h2 id="spin-case-name">Открытие</h2><button class="close-btn" id="close-spin">×</button></div>
+      <div class="roulette-container"><div class="roulette-pointer"></div><div class="roulette-track" id="roulette-track"></div></div>
       <div class="spin-result hidden" id="spin-result">
         <div class="result-item">
           <span class="result-emoji" id="result-emoji">🎁</span>
@@ -218,59 +272,34 @@
     </div>
   </div>
 
-  <!-- Deposit Request Modal -->
   <div id="deposit-modal" class="modal hidden">
     <div class="modal-content deposit-content">
       <h2>Заявка на пополнение</h2>
-      <p class="deposit-note">Укажи сумму и способ оплаты. Админ подтвердит заявку и начислит TON после получения оплаты. Связь — в Telegram по твоему @username.</p>
-      <div class="input-group">
-        <label>Сумма (TON)</label>
-        <input type="number" id="deposit-amount" min="0.1" step="0.1" placeholder="Например 5" required>
-      </div>
-      <div class="input-group">
-        <label>Способ оплаты / комментарий</label>
-        <textarea id="deposit-comment" rows="3" placeholder="Карта / TON-кошелёк / Stars / другой способ + реквизиты если нужно"></textarea>
-      </div>
-      <button class="btn btn-primary" id="submit-deposit">Отправить заявку</button>
+      <p class="deposit-note">Админ подтвердит и начислит TON. Связь в Telegram по @username.</p>
+      <div class="input-group"><label>Сумма (TON)</label><input type="number" id="deposit-amount" min="0.1" step="0.1" placeholder="5"></div>
+      <div class="input-group"><label>Способ / комментарий</label><textarea id="deposit-comment" rows="3" placeholder="Карта / TON / Stars..."></textarea></div>
+      <button class="btn btn-primary" id="submit-deposit">Отправить</button>
       <button class="btn btn-ghost" id="close-deposit" style="margin-top:10px;width:100%">Закрыть</button>
     </div>
   </div>
 
-  <!-- Withdraw Request Modal -->
   <div id="withdraw-modal" class="modal hidden">
     <div class="modal-content deposit-content">
       <h2>Заявка на вывод</h2>
-      <p class="deposit-note">Выбери: вывод баланса (TON) или предметов из инвентаря. Админ напишет тебе в Telegram, чтобы выдать товар / перевести средства.</p>
-      <div class="input-group">
-        <label>Тип вывода</label>
-        <select id="withdraw-type">
-          <option value="balance">Баланс (TON)</option>
-          <option value="item">Предмет из инвентаря</option>
-        </select>
-      </div>
-      <div class="input-group" id="withdraw-balance-group">
-        <label>Сумма TON</label>
-        <input type="number" id="withdraw-amount" min="0.1" step="0.1" placeholder="Сколько вывести">
-      </div>
-      <div class="input-group hidden" id="withdraw-item-group">
-        <label>Предмет</label>
-        <select id="withdraw-item-select">
-          <option value="">— выбери предмет —</option>
-        </select>
-      </div>
-      <div class="input-group">
-        <label>Реквизиты / комментарий</label>
-        <textarea id="withdraw-comment" rows="3" placeholder="TON-адрес / карта / «выдать подарок в TG» и т.д."></textarea>
-      </div>
-      <button class="btn btn-primary" id="submit-withdraw">Отправить заявку</button>
+      <p class="deposit-note">Админ напишет в Telegram и выдаст товар / переведёт.</p>
+      <div class="input-group"><label>Тип</label><select id="withdraw-type"><option value="balance">Баланс (TON)</option><option value="item">Предмет</option></select></div>
+      <div class="input-group" id="withdraw-balance-group"><label>Сумма TON</label><input type="number" id="withdraw-amount" min="0.1" step="0.1"></div>
+      <div class="input-group hidden" id="withdraw-item-group"><label>Предмет</label><select id="withdraw-item-select"><option value="">—</option></select></div>
+      <div class="input-group"><label>Реквизиты / комментарий</label><textarea id="withdraw-comment" rows="3" placeholder="TON-адрес / выдать в TG..."></textarea></div>
+      <button class="btn btn-primary" id="submit-withdraw">Отправить</button>
       <button class="btn btn-ghost" id="close-withdraw" style="margin-top:10px;width:100%">Закрыть</button>
     </div>
   </div>
 
   <div id="toast" class="toast hidden"></div>
-
   <script src="js/firebase.js"></script>
   <script src="js/cases.js"></script>
+  <script src="js/games.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

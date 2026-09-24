@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="nftG" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c084fc"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect x="20" y="35" width="80" height="60" rx="10" fill="url(#nftG)" opacity="0.9"/>
+  <rect x="25" y="28" width="70" height="14" rx="4" fill="#a855f7"/>
+  <path d="M60 50 L72 70 L60 64 L48 70 Z" fill="#fff" opacity="0.9" filter="url(#glow)"/>
+  <circle cx="60" cy="78" r="8" fill="#e9d5ff"/>
+  <text x="60" y="82" text-anchor="middle" font-size="8" fill="#7c3aed" font-weight="bold">NFT</text>
+</svg>

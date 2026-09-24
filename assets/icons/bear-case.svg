@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="bearG" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fb923c"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+  </defs>
+  <rect x="20" y="35" width="80" height="60" rx="10" fill="url(#bearG)"/>
+  <rect x="25" y="28" width="70" height="14" rx="4" fill="#f97316"/>
+  <!-- bear face -->
+  <circle cx="50" cy="58" r="10" fill="#fdbA74"/>
+  <circle cx="70" cy="58" r="10" fill="#fdbA74"/>
+  <ellipse cx="60" cy="68" rx="16" ry="14" fill="#fed7aa"/>
+  <circle cx="54" cy="65" r="2.5" fill="#431407"/>
+  <circle cx="66" cy="65" r="2.5" fill="#431407"/>
+  <ellipse cx="60" cy="72" rx="4" ry="3" fill="#9a3412"/>
+</svg>
