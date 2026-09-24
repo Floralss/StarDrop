@@ -393,20 +393,50 @@ document.getElementById('give-gift-btn').addEventListener('click', async () => {
 // LEADERBOARD
 async function loadLeaderboard() {
   const el = document.getElementById('lb-list');
+  el.innerHTML = '<p class="empty-state">Загрузка...</p>';
   try {
-    // Need public read of users for LB - fallback: only show if rules allow
-    const snap = await db.collection('users').orderBy('balance', 'desc').limit(20).get();
-    if (snap.empty) { el.innerHTML = '<p class="empty-state">Пока пусто</p>'; return; }
-    el.innerHTML = snap.docs.map((d, i) => {
+    // Real users only from Firestore
+    const snap = await db.collection('users').orderBy('balance', 'desc').limit(50).get();
+    const rows = [];
+    snap.docs.forEach(d => {
       const u = d.data();
+      // Skip incomplete / placeholder accounts
+      if (!u.username || u.username === '@?' || u.username === '@unknown') return;
+      if (u.numericId == null) return;
+      rows.push(u);
+    });
+    // Already sorted by balance desc
+    if (!rows.length) {
+      el.innerHTML = '<p class="empty-state">Пока никого нет — будь первым!</p>';
+      return;
+    }
+    el.innerHTML = rows.slice(0, 20).map((u, i) => {
       const rankClass = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : '';
-      return `<div class="lb-row"><div class="lb-rank ${rankClass}">#${i+1}</div><div class="lb-user">${u.username||'?'}<span>ID ${u.numericId||'—'}</span></div><div class="lb-score">${(u.balance||0).toFixed(2)} TON</div></div>`;
+      return `<div class="lb-row"><div class="lb-rank ${rankClass}">#${i+1}</div><div class="lb-user">${u.username}<span>ID ${u.numericId}</span></div><div class="lb-score">${(u.balance||0).toFixed(2)} TON</div></div>`;
     }).join('');
   } catch (e) {
-    // If rules block orderBy on all users, show message
-    el.innerHTML = '<p class="empty-state">Лидерборд: добавь в Firestore rules чтение users для авторизованных, или индекс balance.</p>';
+    console.error(e);
+    // Fallback without orderBy
+    try {
+      const snap = await db.collection('users').limit(50).get();
+      const rows = snap.docs.map(d => d.data())
+        .filter(u => u.username && u.username !== '@?' && u.numericId != null)
+        .sort((a, b) => (b.balance || 0) - (a.balance || 0))
+        .slice(0, 20);
+      if (!rows.length) {
+        el.innerHTML = '<p class="empty-state">Пока никого нет</p>';
+        return;
+      }
+      el.innerHTML = rows.map((u, i) => {
+        const rankClass = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : '';
+        return `<div class="lb-row"><div class="lb-rank ${rankClass}">#${i+1}</div><div class="lb-user">${u.username}<span>ID ${u.numericId}</span></div><div class="lb-score">${(u.balance||0).toFixed(2)} TON</div></div>`;
+      }).join('');
+    } catch (e2) {
+      el.innerHTML = '<p class="empty-state">Нужны Firestore rules: allow read на users для авторизованных</p>';
+    }
   }
 }
+
 
 // CASES
 document.querySelectorAll('.btn-open').forEach(btn => {
@@ -632,56 +662,38 @@ document.getElementById('rocket-start').addEventListener('click', async () => {
 });
 document.getElementById('rocket-cashout').addEventListener('click', () => RocketGame.cashout());
 
-// Gift Upgrade
+// Gift Upgrade (CS-style)
 window.fillUpgradeInventory = function() {
-  const sel = document.getElementById('upgrade-item-select');
-  if (!sel) return;
-  const inv = userData.inventory || [];
-  sel.innerHTML = '<option value="">— выбери —</option>';
-  inv.forEach((item, i) => {
-    const o = document.createElement('option');
-    o.value = i;
-    o.textContent = item.emoji + ' ' + item.name + ' (' + item.rarity + ')';
-    sel.appendChild(o);
-  });
+  if (typeof GiftUpgrade === 'undefined') return;
+  GiftUpgrade.selectedStake.clear();
+  GiftUpgrade.selectedTarget = null;
+  GiftUpgrade.renderStake(userData.inventory || []);
+  GiftUpgrade.renderTargets();
+  GiftUpgrade.updateUI(userData.inventory || []);
+  const res = document.getElementById('cs-upgrade-result');
+  if (res) { res.textContent = ''; res.className = 'cs-upgrade-result'; }
 };
 
-document.getElementById('upgrade-item-select')?.addEventListener('change', e => {
-  const idx = parseInt(e.target.value, 10);
-  const info = document.getElementById('upgrade-chance-info');
-  if (isNaN(idx) || !userData.inventory[idx]) { info.textContent = 'Шанс зависит от редкости'; return; }
-  const item = userData.inventory[idx];
-  const ch = (GiftUpgrade.successChance[item.rarity] || 0.4) * 100;
-  info.textContent = 'Шанс апгрейда «' + item.name + '»: ' + ch.toFixed(0) + '%';
-});
-
 document.getElementById('upgrade-go').addEventListener('click', async () => {
-  if (GiftUpgrade.spinning) return;
-  const idx = parseInt(document.getElementById('upgrade-item-select').value, 10);
-  if (isNaN(idx) || !userData.inventory[idx]) return showToast('Выбери подарок', 'error');
-  const item = userData.inventory[idx];
-  document.getElementById('upgrade-wheel-result').innerHTML = '';
-  document.getElementById('upgrade-wheel-result').className = 'upgrade-wheel-result';
-  document.getElementById('upgrade-go').disabled = true;
-  await GiftUpgrade.spin(item, idx);
-  document.getElementById('upgrade-go').disabled = false;
-});
-
-window.onGiftUpgradeDone = async (success, resultItem, itemIndex) => {
-  const inv = [...(userData.inventory || [])];
-  // Remove original gift
-  if (itemIndex >= 0 && itemIndex < inv.length) inv.splice(itemIndex, 1);
-  if (success && resultItem) {
-    inv.unshift(resultItem);
-    showToast('Апгрейд! ' + resultItem.emoji + ' ' + resultItem.name, 'success');
+  if (typeof GiftUpgrade === 'undefined' || GiftUpgrade.spinning) return;
+  const result = await GiftUpgrade.play(userData.inventory || []);
+  if (!result) return;
+  let inv = [...(userData.inventory || [])];
+  result.stakeIndices.forEach(i => {
+    if (i >= 0 && i < inv.length) inv.splice(i, 1);
+  });
+  if (result.win && result.target) {
+    inv.unshift(result.target);
+    showToast('Апгрейд успешен! ' + result.target.emoji + ' ' + result.target.name, 'success');
   } else {
-    showToast('Подарок сгорел 🔥', 'error');
+    showToast('Апгрейд провален — предметы сгорели', 'error');
   }
   await db.collection('users').doc(currentUser.uid).update({ inventory: inv });
   userData.inventory = inv;
   updateUI();
   fillUpgradeInventory();
-};
+});
+
 
 // Backdrop close
 ['spin-modal','deposit-modal','withdraw-modal'].forEach(id => {

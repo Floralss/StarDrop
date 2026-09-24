@@ -139,114 +139,169 @@ const RocketGame = {
   }
 };
 
+// Catalog of upgrade targets (gifts you can aim for)
+const UPGRADE_TARGETS = [
+  { id: 't_fluffy', name: 'Fluffy Bear', emoji: '🐻‍❄️', rarity: 'uncommon', value: 0.35 },
+  { id: 't_box', name: 'Gift Box', emoji: '🎁', rarity: 'uncommon', value: 0.5 },
+  { id: 't_stars50', name: '50 Stars', emoji: '🌟', rarity: 'uncommon', value: 0.5 },
+  { id: 't_white', name: 'White Plush Bear', emoji: '🤍🧸', rarity: 'rare', value: 1.5 },
+  { id: 't_nft_c', name: 'NFT Common', emoji: '💎', rarity: 'rare', value: 2.5 },
+  { id: 't_stars100', name: '100 Stars', emoji: '💫', rarity: 'rare', value: 1.0 },
+  { id: 't_nft_r', name: 'NFT Rare', emoji: '💠', rarity: 'epic', value: 8.0 },
+  { id: 't_bear_nft', name: 'NFT White Bear', emoji: '🐻‍❄️✨', rarity: 'epic', value: 8.0 },
+  { id: 't_mecha', name: 'Mecha Part', emoji: '⚙️', rarity: 'epic', value: 6.0 },
+  { id: 't_nft_e', name: 'NFT Epic', emoji: '🔮', rarity: 'legendary', value: 25.0 },
+  { id: 't_suit', name: 'Full Mecha Suit', emoji: '🤖', rarity: 'legendary', value: 40.0 },
+  { id: 't_nft_l', name: 'NFT Legendary', emoji: '👑', rarity: 'mythic', value: 80.0 },
+  { id: 't_myth', name: 'NFT Mythic', emoji: '🕶️', rarity: 'mythic', value: 200.0 }
+];
+
 const GiftUpgrade = {
   spinning: false,
-  upgradeMap: {
-    common: [
-      { name: 'Fluffy Bear', emoji: '🐻‍❄️', rarity: 'uncommon', value: 0.35 },
-      { name: '50 Stars', emoji: '🌟', rarity: 'uncommon', value: 0.5 },
-      { name: 'Gift Box', emoji: '🎁', rarity: 'uncommon', value: 0.3 }
-    ],
-    uncommon: [
-      { name: 'White Plush Bear', emoji: '🤍🧸', rarity: 'rare', value: 1.5 },
-      { name: 'NFT Common', emoji: '💎', rarity: 'rare', value: 1.2 },
-      { name: '100 Stars', emoji: '💫', rarity: 'rare', value: 1.0 }
-    ],
-    rare: [
-      { name: 'NFT Rare', emoji: '💠', rarity: 'epic', value: 4.0 },
-      { name: 'NFT White Fluffy Bear', emoji: '🐻‍❄️✨', rarity: 'epic', value: 8.0 },
-      { name: 'Mecha Part', emoji: '⚙️', rarity: 'epic', value: 6.0 }
-    ],
-    epic: [
-      { name: 'NFT Epic', emoji: '🔮', rarity: 'legendary', value: 12.0 },
-      { name: 'Full Mecha Suit', emoji: '🤖', rarity: 'legendary', value: 40.0 },
-      { name: 'NFT Legendary Bear', emoji: '👑🐻', rarity: 'legendary', value: 35.0 }
-    ],
-    legendary: [
-      { name: 'NFT Legendary', emoji: '👑', rarity: 'mythic', value: 80.0 },
-      { name: 'NFT Mythic (Durov)', emoji: '🕶️', rarity: 'mythic', value: 200.0 }
-    ],
-    mythic: [
-      { name: 'NFT Mythic Collection', emoji: '🕶️', rarity: 'mythic', value: 250.0 }
-    ]
+  selectedStake: new Set(), // inventory indices
+  selectedTarget: null,
+
+  getStakeValue(inventory) {
+    let v = 0;
+    this.selectedStake.forEach(i => {
+      if (inventory[i]) v += inventory[i].value || 0;
+    });
+    return v;
   },
-  successChance: { common: 0.55, uncommon: 0.45, rare: 0.35, epic: 0.25, legendary: 0.15, mythic: 0.08 },
 
-  getTargets(rarity) { return this.upgradeMap[rarity] || this.upgradeMap.common; },
+  // Chance = stake / target * 100, capped 1-85%, house edge ~8%
+  calcChance(stakeVal, targetVal) {
+    if (!targetVal || targetVal <= 0 || stakeVal <= 0) return 0;
+    let raw = (stakeVal / targetVal) * 100 * 0.92;
+    return Math.max(0, Math.min(85, raw));
+  },
 
-  async spin(item, itemIndex) {
-    if (this.spinning) return;
+  updateUI(inventory) {
+    const stakeVal = this.getStakeValue(inventory);
+    const targetVal = this.selectedTarget ? this.selectedTarget.value : 0;
+    const chance = this.calcChance(stakeVal, targetVal);
+    document.getElementById('cs-stake-value').textContent = stakeVal.toFixed(2);
+    document.getElementById('cs-target-value').textContent = targetVal.toFixed(2);
+    document.getElementById('cs-chance-num').textContent = chance.toFixed(1) + '%';
+    // Ring fill: 534 = full circumference
+    const circ = 534;
+    const offset = circ - (circ * chance / 100);
+    const fill = document.getElementById('cs-ring-fill');
+    fill.style.strokeDashoffset = offset;
+    // Color by chance
+    if (chance < 20) fill.style.stroke = '#ef4444';
+    else if (chance < 45) fill.style.stroke = '#f59e0b';
+    else fill.style.stroke = '#22c55e';
+  },
+
+  renderStake(inventory) {
+    const el = document.getElementById('cs-stake-list');
+    if (!inventory.length) {
+      el.innerHTML = '<p class="empty-state" style="padding:20px;grid-column:1/-1">Инвентарь пуст</p>';
+      return;
+    }
+    el.innerHTML = inventory.map((item, i) => {
+      const sel = this.selectedStake.has(i) ? ' selected' : '';
+      return `<div class="cs-item${sel}" data-idx="${i}">
+        <span class="ci-emoji">${item.emoji}</span>
+        <div class="ci-name">${item.name}</div>
+        <div class="ci-val">${(item.value||0).toFixed(2)}</div>
+      </div>`;
+    }).join('');
+    el.querySelectorAll('.cs-item').forEach(card => {
+      card.addEventListener('click', () => {
+        const idx = parseInt(card.dataset.idx, 10);
+        if (this.selectedStake.has(idx)) this.selectedStake.delete(idx);
+        else this.selectedStake.add(idx);
+        this.renderStake(inventory);
+        this.updateUI(inventory);
+      });
+    });
+  },
+
+  renderTargets() {
+    const el = document.getElementById('cs-target-list');
+    el.innerHTML = UPGRADE_TARGETS.map((t, i) => {
+      const sel = this.selectedTarget && this.selectedTarget.id === t.id ? ' selected' : '';
+      return `<div class="cs-item${sel}" data-ti="${i}">
+        <span class="ci-emoji">${t.emoji}</span>
+        <div class="ci-name">${t.name}</div>
+        <div class="ci-val">${t.value.toFixed(2)}</div>
+      </div>`;
+    }).join('');
+    el.querySelectorAll('.cs-item').forEach(card => {
+      card.addEventListener('click', () => {
+        const i = parseInt(card.dataset.ti, 10);
+        this.selectedTarget = UPGRADE_TARGETS[i];
+        this.renderTargets();
+        if (typeof userData !== 'undefined') this.updateUI(userData.inventory || []);
+      });
+    });
+  },
+
+  async play(inventory) {
+    if (this.spinning) return null;
+    const stakeVal = this.getStakeValue(inventory);
+    if (this.selectedStake.size === 0) { showToast('Выбери предметы для ставки', 'error'); return null; }
+    if (!this.selectedTarget) { showToast('Выбери цель', 'error'); return null; }
+    if (stakeVal <= 0) { showToast('Ставка пуста', 'error'); return null; }
+
+    const chance = this.calcChance(stakeVal, this.selectedTarget.value);
+    if (chance < 1) { showToast('Шанс слишком низкий — добавь предметы', 'error'); return null; }
+
     this.spinning = true;
-    const chance = this.successChance[item.rarity] || 0.4;
-    const success = Math.random() < chance;
-    const targets = this.getTargets(item.rarity);
-    const resultItem = success
-      ? { ...targets[Math.floor(Math.random() * targets.length)], id: 'up_' + Date.now(), wonAt: new Date().toISOString() }
-      : null;
+    document.getElementById('upgrade-go').disabled = true;
+    document.getElementById('cs-upgrade-result').textContent = '';
+    document.getElementById('cs-upgrade-result').className = 'cs-upgrade-result';
 
-    const segments = [];
-    targets.forEach(t => segments.push({ ...t, type: 'win' }));
-    const failCount = Math.max(2, Math.round(segments.length * (1 - chance) / Math.max(chance, 0.1)));
-    for (let i = 0; i < failCount; i++) segments.push({ name: 'СГОРЕЛ', emoji: '🔥', rarity: 'fail', type: 'fail' });
+    const win = Math.random() * 100 < chance;
 
-    this.renderWheel(segments);
-    await this.animateWheel(segments, success, resultItem);
+    // Animate spin marker
+    const spinEl = document.getElementById('cs-ring-spin');
+    // Land in win zone (top portion = chance%) or lose zone
+    // Full circle 360deg. Win zone is first `chance` percent from pointer.
+    // We spin multiple turns then land.
+    const baseSpins = 5 * 360;
+    let landAngle;
+    if (win) {
+      // land somewhere in the success arc (0 to chance% of 360)
+      landAngle = Math.random() * (chance / 100) * 360;
+    } else {
+      landAngle = (chance / 100) * 360 + Math.random() * ((100 - chance) / 100) * 360;
+    }
+    const endDeg = baseSpins + landAngle;
+    spinEl.style.setProperty('--spin-end', endDeg + 'deg');
+    spinEl.classList.remove('spinning');
+    spinEl.offsetHeight;
+    spinEl.classList.add('spinning');
+
+    await new Promise(r => setTimeout(r, 4200));
+    spinEl.classList.remove('spinning');
+
     this.spinning = false;
-    if (typeof onGiftUpgradeDone === 'function') onGiftUpgradeDone(success, resultItem, itemIndex);
-  },
+    document.getElementById('upgrade-go').disabled = false;
 
-  renderWheel(segments) {
-    const wheel = document.getElementById('upgrade-wheel');
-    if (!wheel) return;
-    const n = segments.length;
-    const angle = 360 / n;
-    const colors = ['#7c5cff', '#22c55e', '#f59e0b', '#ef4444', '#3b82f6', '#a855f7', '#06b6d4', '#f97316'];
-    let html = '';
-    segments.forEach((s, i) => {
-      const rot = i * angle;
-      const col = s.type === 'fail' ? '#ef4444' : colors[i % colors.length];
-      html += '<div class="wheel-seg" style="transform:rotate(' + rot + 'deg);--seg-color:' + col + '"><span class="wheel-seg-label" style="transform:rotate(' + (angle/2) + 'deg) translateY(-78px)">' + s.emoji + '</span></div>';
-    });
-    wheel.innerHTML = html;
-    wheel.style.transform = 'rotate(0deg)';
-  },
+    const res = document.getElementById('cs-upgrade-result');
+    if (win) {
+      res.textContent = '✓ ' + this.selectedTarget.emoji + ' ' + this.selectedTarget.name;
+      res.className = 'cs-upgrade-result win';
+    } else {
+      res.textContent = '✗ Предметы сгорели';
+      res.className = 'cs-upgrade-result lose';
+      document.body.classList.add('screen-shake');
+      setTimeout(() => document.body.classList.remove('screen-shake'), 400);
+    }
 
-  animateWheel(segments, success, resultItem) {
-    return new Promise(resolve => {
-      const wheel = document.getElementById('upgrade-wheel');
-      const n = segments.length;
-      const angle = 360 / n;
-      let targetIdx;
-      if (success && resultItem) {
-        targetIdx = segments.findIndex(s => s.type === 'win' && s.name === resultItem.name);
-        if (targetIdx < 0) targetIdx = segments.findIndex(s => s.type === 'win');
-      } else {
-        targetIdx = segments.findIndex(s => s.type === 'fail');
-      }
-      if (targetIdx < 0) targetIdx = 0;
-      const segmentCenter = targetIdx * angle + angle / 2;
-      const finalRot = 360 * 6 + (360 - segmentCenter);
-      wheel.style.transition = 'none';
-      wheel.style.transform = 'rotate(0deg)';
-      wheel.offsetHeight;
-      wheel.style.transition = 'transform 4.5s cubic-bezier(0.12, 0.8, 0.15, 1)';
-      wheel.style.transform = 'rotate(' + finalRot + 'deg)';
-      setTimeout(() => {
-        const res = document.getElementById('upgrade-wheel-result');
-        if (res) {
-          if (success && resultItem) {
-            res.innerHTML = '<span class="up-win">' + resultItem.emoji + ' ' + resultItem.name + '</span>';
-            res.className = 'upgrade-wheel-result win';
-          } else {
-            res.innerHTML = '<span class="up-lose">🔥 Предмет сгорел</span>';
-            res.className = 'upgrade-wheel-result lose';
-          }
-        }
-        resolve();
-      }, 4600);
-    });
+    // Return result for app.js to update inventory
+    const stakeIndices = [...this.selectedStake].sort((a,b) => b - a); // remove high indices first
+    const target = win ? { ...this.selectedTarget, id: 'up_' + Date.now(), wonAt: new Date().toISOString() } : null;
+    this.selectedStake.clear();
+    return { win, target, stakeIndices };
   }
 };
+
+window.UPGRADE_TARGETS = UPGRADE_TARGETS;
+window.GiftUpgrade = GiftUpgrade;
 
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.game-card').forEach(card => {

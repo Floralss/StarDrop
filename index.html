@@ -134,7 +134,7 @@
           </div>
           <div class="game-card" data-game="upgrade">
             <img src="assets/icons/upgrade.svg" alt=""><h3>Апгрейдер</h3>
-            <p>Апгрейд подарков с колесом. Успех — редче. Провал — сгорает.</p>
+            <p>Апгрейд как в CS: ставка предметами → цель → шанс на круге.</p>
             <span class="game-min">из инвентаря</span>
           </div>
         </div>
@@ -176,19 +176,42 @@
       <div id="game-upgrade" class="game-view">
         <button class="back-games" id="back-upgrade">← Назад к играм</button>
         <h2 class="page-title">Апгрейд подарков</h2>
-        <p class="page-hint">Выбери подарок из инвентаря. Колесо решит: апгрейд или сгорит (как в CS).</p>
-        <div class="upgrade-panel">
-          <div class="input-group">
-            <label>Предмет из инвентаря</label>
-            <select id="upgrade-item-select"><option value="">— выбери —</option></select>
+        <p class="page-hint">Выбери предметы слева (ставка) и цель справа. Шанс = стоимость ставки / цель. Как в CS.</p>
+
+        <div class="cs-upgrade-layout">
+          <!-- LEFT: stake items from inventory -->
+          <div class="cs-panel cs-left">
+            <h3>Твоя ставка</h3>
+            <p class="cs-sub">Выбери 1+ предмет из инвентаря</p>
+            <div id="cs-stake-list" class="cs-item-grid"></div>
+            <div class="cs-stake-total">Сумма ставки: <span id="cs-stake-value">0.00</span> TON</div>
           </div>
-          <p id="upgrade-chance-info" class="page-hint">Шанс зависит от редкости</p>
-          <div class="wheel-wrap">
-            <div class="wheel-pointer"></div>
-            <div class="upgrade-wheel" id="upgrade-wheel"></div>
+
+          <!-- CENTER: chance ring -->
+          <div class="cs-panel cs-center">
+            <div class="cs-ring-wrap">
+              <svg class="cs-ring-svg" viewBox="0 0 200 200">
+                <circle class="cs-ring-bg" cx="100" cy="100" r="85" />
+                <circle class="cs-ring-fill" id="cs-ring-fill" cx="100" cy="100" r="85" />
+                <circle class="cs-ring-spin" id="cs-ring-spin" cx="100" cy="100" r="85" />
+              </svg>
+              <div class="cs-ring-pointer"></div>
+              <div class="cs-ring-center">
+                <div class="cs-chance-num" id="cs-chance-num">0%</div>
+                <div class="cs-chance-label">шанс</div>
+              </div>
+            </div>
+            <div id="cs-upgrade-result" class="cs-upgrade-result"></div>
+            <button class="btn btn-primary" id="upgrade-go" style="width:auto;min-width:180px;margin-top:12px">⬆ Upgrade</button>
           </div>
-          <div id="upgrade-wheel-result" class="upgrade-wheel-result"></div>
-          <button class="btn btn-primary" id="upgrade-go">Крутить апгрейд</button>
+
+          <!-- RIGHT: target catalog -->
+          <div class="cs-panel cs-right">
+            <h3>Цель апгрейда</h3>
+            <p class="cs-sub">Выбери что хочешь получить</p>
+            <div id="cs-target-list" class="cs-item-grid"></div>
+            <div class="cs-stake-total">Цель: <span id="cs-target-value">0.00</span> TON</div>
+          </div>
         </div>
       </div>
     </main>
