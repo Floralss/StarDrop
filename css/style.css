@@ -1471,3 +1471,38 @@ body.mythic-alert {
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255,255,255,0.08) !important;
 }
+
+/* Photoreal case chests */
+.chest-img-wrap {
+  width: 200px !important;
+  height: 200px !important;
+  margin: 0 auto 10px !important;
+}
+.chest-img-wrap.big {
+  width: 240px !important;
+  height: 240px !important;
+}
+.chest-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 12px 28px rgba(0,0,0,0.5)) !important;
+}
+.nft-glow { filter: drop-shadow(0 0 28px rgba(34, 197, 94, 0.45)) !important; }
+.bear-glow { filter: drop-shadow(0 0 28px rgba(34, 197, 94, 0.5)) !important; }
+.mecha-glow { filter: drop-shadow(0 0 28px rgba(168, 85, 247, 0.55)) !important; }
+.case-card.gift-style {
+  padding: 18px 14px 16px !important;
+  background: rgba(15, 17, 26, 0.9) !important;
+  border: 1px solid rgba(255,255,255,0.07) !important;
+}
+body {
+  background-color: #0a0c14 !important;
+  background-image:
+    url('../assets/bg-main.png'),
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(124, 92, 255, 0.22), transparent 60%) !important;
+  background-size: cover, auto !important;
+  background-position: center, center !important;
+  background-attachment: fixed, fixed !important;
+  background-blend-mode: normal, normal !important;
+}
