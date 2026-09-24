@@ -1412,3 +1412,35 @@ body.mythic-alert {
   height: 72px !important;
   margin: 0 auto 8px;
 }
+
+/* Plinko */
+.plinko-panel { max-width: 420px; margin: 0 auto; text-align: center; }
+.plinko-board {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 8px;
+  margin: 12px 0;
+  overflow: hidden;
+}
+#plinko-canvas { display: block; margin: 0 auto; max-width: 100%; }
+.plinko-slots {
+  display: flex; gap: 3px; justify-content: center;
+  margin-top: 8px; flex-wrap: nowrap;
+}
+.plinko-slot {
+  flex: 1; min-width: 0;
+  font-size: 0.65rem; font-weight: 800;
+  padding: 8px 2px; border-radius: 8px;
+  background: #1e2433; color: #9ca3af;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.plinko-slot.slot-hot { background: rgba(239,68,68,0.25); color: #fca5a5; }
+.plinko-slot.slot-warm { background: rgba(245,158,11,0.2); color: #fcd34d; }
+.plinko-slot.slot-cold { background: rgba(100,100,120,0.3); color: #6b7280; }
+.plinko-slot.slot-win {
+  transform: scale(1.12);
+  box-shadow: 0 0 16px rgba(124,92,255,0.5);
+  border: 1px solid var(--primary);
+}

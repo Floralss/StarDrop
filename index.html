@@ -127,6 +127,11 @@
             <p>3 попытки. Найди единственного Pepe. x4 / x8 / x16.</p>
             <span class="game-min">любая ставка</span>
           </div>
+          <div class="game-card" data-game="plinko">
+            <span style="font-size:2.5rem">🟣</span><h3>Плинко</h3>
+            <p>Шарик падает между штырями. Множитель зависит от слота.</p>
+            <span class="game-min">мин. 0.5 TON</span>
+          </div>
         </div>
       </div>
       <div id="game-mines" class="game-view">
@@ -224,6 +229,31 @@
           <div class="pepe-tries">Попытки: <span id="pepe-tries">3</span></div>
           <div id="pepe-grid" class="pepe-grid"></div>
           <div id="pepe-result" class="cs-upgrade-result"></div>
+        </div>
+      </div>
+
+    
+      <div id="game-plinko" class="game-view">
+        <button class="back-games" id="back-plinko">← Назад к играм</button>
+        <h2 class="page-title">Плинко</h2>
+        <p class="page-hint">Выбери риск и брось шар. Краевые слоты — высокие множители.</p>
+        <div class="plinko-panel">
+          <div class="mines-controls">
+            <div class="input-group"><label>Ставка (TON)</label><input type="number" id="plinko-bet" min="0.5" step="0.1" value="1"></div>
+            <div class="input-group"><label>Риск</label>
+              <select id="plinko-risk">
+                <option value="low">Низкий</option>
+                <option value="med" selected>Средний</option>
+                <option value="high">Высокий</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" id="plinko-drop">Бросить</button>
+          </div>
+          <div class="plinko-board" id="plinko-board">
+            <canvas id="plinko-canvas" width="360" height="420"></canvas>
+          </div>
+          <div class="plinko-slots" id="plinko-slots"></div>
+          <div id="plinko-result" class="cs-upgrade-result"></div>
         </div>
       </div>
 

@@ -388,7 +388,153 @@ const PepeGame = {
 };
 window.PepeGame = PepeGame;
 
+
+// Plinko — ball drops through pegs into multiplier slots
+const PlinkoGame = {
+  dropping: false,
+  rows: 10,
+  risk: 'med',
+  // multipliers by risk (11 slots for 10 rows)
+  multis: {
+    low:  [1.5, 1.2, 1.1, 1.0, 0.5, 0.3, 0.5, 1.0, 1.1, 1.2, 1.5],
+    med:  [5.0, 2.0, 1.5, 1.0, 0.5, 0.3, 0.5, 1.0, 1.5, 2.0, 5.0],
+    high: [15, 5.0, 2.0, 0.5, 0.2, 0.1, 0.2, 0.5, 2.0, 5.0, 15]
+  },
+
+  renderSlots() {
+    const m = this.multis[this.risk] || this.multis.med;
+    const el = document.getElementById('plinko-slots');
+    if (!el) return;
+    el.innerHTML = m.map((v, i) => {
+      const cls = v >= 5 ? 'slot-hot' : v >= 1.5 ? 'slot-warm' : v < 0.5 ? 'slot-cold' : '';
+      return '<div class="plinko-slot ' + cls + '">x' + v + '</div>';
+    }).join('');
+  },
+
+  drawBoard(highlightSlot) {
+    const canvas = document.getElementById('plinko-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+    const rows = this.rows;
+    const top = 30, bottom = H - 40;
+    const usable = bottom - top;
+    this.pegs = [];
+    for (let r = 0; r < rows; r++) {
+      const n = r + 3;
+      const y = top + (usable * (r + 1) / (rows + 1));
+      const spacing = Math.min(36, (W - 40) / (n + 1));
+      const startX = (W - (n - 1) * spacing) / 2;
+      for (let i = 0; i < n; i++) {
+        const x = startX + i * spacing;
+        this.pegs.push({ x, y, r: 5 });
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fillStyle = '#7c5cff';
+        ctx.shadowColor = 'rgba(124,92,255,0.6)';
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+  },
+
+  async drop(bet) {
+    if (this.dropping) return null;
+    this.dropping = true;
+    this.risk = document.getElementById('plinko-risk')?.value || 'med';
+    this.renderSlots();
+    this.drawBoard();
+
+    const canvas = document.getElementById('plinko-canvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const multis = this.multis[this.risk];
+    const slots = multis.length;
+
+    // Path: random left/right at each row → binomial slot
+    let path = 0;
+    for (let i = 0; i < this.rows; i++) {
+      path += Math.random() < 0.5 ? 0 : 1;
+    }
+    // path is 0..rows, map to slot 0..slots-1
+    const slot = Math.min(slots - 1, Math.round(path * (slots - 1) / this.rows));
+
+    // Animate ball
+    let x = W / 2, y = 12;
+    const ballR = 7;
+    const steps = 50 + this.rows * 8;
+    let step = 0;
+
+    // Precompute key points along path
+    const targets = [{ x: W / 2, y: 12 }];
+    let colBias = 0;
+    for (let r = 0; r < this.rows; r++) {
+      const goRight = (path > r) ? (Math.random() > 0.35) : (Math.random() > 0.65);
+      // simpler: distribute path
+      colBias = Math.round((path / this.rows) * (r + 1));
+      const n = r + 3;
+      const spacing = Math.min(36, (W - 40) / (n + 1));
+      const startX = (W - (n - 1) * spacing) / 2;
+      const pegIdx = Math.min(n - 1, Math.max(0, Math.round((path / this.rows) * (n - 1))));
+      const px = startX + pegIdx * spacing + (Math.random() - 0.5) * 8;
+      const py = 30 + ((H - 70) * (r + 1) / (this.rows + 1));
+      targets.push({ x: px, y: py });
+    }
+    // final slot center
+    const slotW = W / slots;
+    targets.push({ x: slotW * (slot + 0.5), y: H - 20 });
+
+    return new Promise(resolve => {
+      const animate = () => {
+        step++;
+        const t = Math.min(1, step / steps);
+        // ease
+        const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        const segCount = targets.length - 1;
+        const f = ease * segCount;
+        const si = Math.min(segCount - 1, Math.floor(f));
+        const local = f - si;
+        const a = targets[si], b = targets[si + 1];
+        x = a.x + (b.x - a.x) * local;
+        y = a.y + (b.y - a.y) * local;
+        // bounce offset
+        x += Math.sin(step * 0.8) * 2 * (1 - t);
+
+        this.drawBoard();
+        ctx.beginPath();
+        ctx.arc(x, y, ballR, 0, Math.PI * 2);
+        ctx.fillStyle = '#f0abfc';
+        ctx.shadowColor = '#e879f9';
+        ctx.shadowBlur = 12;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        if (t < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          this.dropping = false;
+          // highlight slot
+          const slotEls = document.querySelectorAll('.plinko-slot');
+          slotEls.forEach((el, i) => el.classList.toggle('slot-win', i === slot));
+          const mult = multis[slot];
+          resolve({ slot, mult, win: bet * mult });
+        }
+      };
+      requestAnimationFrame(animate);
+    });
+  }
+};
+window.PlinkoGame = PlinkoGame;
+
 document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('plinko-risk')?.addEventListener('change', e => {
+    PlinkoGame.risk = e.target.value;
+    PlinkoGame.renderSlots();
+    PlinkoGame.drawBoard();
+  });
+
   document.querySelectorAll('.game-card').forEach(card => {
     card.addEventListener('click', () => {
       const g = card.dataset.game;
@@ -399,9 +545,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (g === 'mines') { MinesGame.active = false; MinesGame.grid = Array(25).fill(null); MinesGame.render(); }
       if (g === 'upgrade' && typeof fillUpgradeInventory === 'function') fillUpgradeInventory();
       if (g === 'pepe') { PepeGame.active = false; document.getElementById('pepe-grid').innerHTML = ''; document.getElementById('pepe-result').textContent = ''; }
+      if (g === 'plinko') { PlinkoGame.risk = document.getElementById('plinko-risk')?.value || 'med'; PlinkoGame.renderSlots(); PlinkoGame.drawBoard(); }
     });
   });
-  ['mines', 'rocket', 'upgrade', 'pepe'].forEach(g => {
+  ['mines', 'rocket', 'upgrade', 'pepe', 'plinko'].forEach(g => {
     const btn = document.getElementById('back-' + g);
     if (btn) btn.addEventListener('click', () => {
       document.querySelectorAll('.game-view').forEach(v => v.classList.remove('active'));

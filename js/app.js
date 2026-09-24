@@ -847,6 +847,29 @@ window.onRocketWin = async (win) => {
 window.onRocketLose = () => {};
 
 
+
+// Plinko
+document.getElementById('plinko-drop')?.addEventListener('click', async () => {
+  if (PlinkoGame.dropping) return;
+  const bet = parseFloat(document.getElementById('plinko-bet').value);
+  if (!bet || bet < 0.5) return showToast('Мин. ставка 0.5 TON', 'error');
+  if ((userData.balance || 0) < bet) return showToast('Недостаточно TON', 'error');
+  await setBalance(userData.balance - bet);
+  document.getElementById('plinko-result').textContent = '';
+  const res = await PlinkoGame.drop(bet);
+  if (!res) return;
+  await setBalance((userData.balance || 0) + res.win);
+  const el = document.getElementById('plinko-result');
+  if (res.mult >= 1) {
+    el.textContent = 'x' + res.mult + ' → +' + res.win.toFixed(2) + ' TON';
+    el.className = 'cs-upgrade-result win';
+    showToast('Плинко x' + res.mult + '!', 'success');
+  } else {
+    el.textContent = 'x' + res.mult + ' → ' + res.win.toFixed(2) + ' TON';
+    el.className = 'cs-upgrade-result lose';
+  }
+});
+
 // Find Pepe
 document.getElementById('pepe-start')?.addEventListener('click', async () => {
   if (PepeGame.active) return;
