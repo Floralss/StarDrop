@@ -1138,3 +1138,197 @@ body.mythic-alert {
   0% { transform: translateY(0) rotate(0); opacity: 1; }
   100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
 }
+
+/* TON diamond on balance */
+.ton-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 6px;
+  background: linear-gradient(135deg, #0098ea, #00c2ff);
+  color: #fff; font-size: 0.7rem; font-weight: 900;
+  box-shadow: 0 0 12px rgba(0, 152, 234, 0.55);
+  margin-right: 2px;
+  transform: rotate(0deg);
+  line-height: 1;
+}
+.balance-box {
+  gap: 8px;
+  align-items: center;
+}
+
+/* CS ring white spinner segment — more visible */
+.cs-ring-spin {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 28 506;
+  stroke-dashoffset: 0;
+  opacity: 0;
+  transform-origin: 100px 100px;
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.9));
+}
+.cs-ring-spin.spinning {
+  opacity: 1;
+  animation: ringSpin 4s cubic-bezier(0.12, 0.8, 0.15, 1) forwards;
+}
+/* Hide bottom triangle pointer — marker is the white arc */
+.cs-ring-pointer {
+  display: none;
+}
+/* Fixed top indicator notch */
+.cs-ring-wrap::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 50%; transform: translateX(-50%);
+  width: 4px; height: 14px;
+  background: #fff;
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(255,255,255,0.8);
+  z-index: 3;
+}
+
+/* Admin gift select wider */
+#give-gift-select {
+  min-width: 200px;
+  max-width: 320px;
+}
+
+/* Inventory images larger */
+.inv-item .item-vis {
+  width: 64px; height: 64px;
+}
+.inv-item .item-img {
+  width: 90%; height: 90%;
+}
+
+/* ===== 1GIFT-style case cards ===== */
+.cases-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+.case-card.gift-style {
+  background: #151820;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 20px;
+  padding: 20px 16px 18px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.25s;
+  display: flex; flex-direction: column; align-items: center;
+}
+.case-card.gift-style:hover {
+  transform: translateY(-4px);
+}
+.case-card.gift-style .btn-open {
+  width: 100%; margin-top: 12px; padding: 10px;
+  border-radius: 12px; font-size: 0.9rem;
+}
+
+.chest-wrap {
+  width: 140px; height: 130px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 12px;
+  position: relative;
+}
+.chest-wrap.big { width: 180px; height: 160px; margin: 0 auto 8px; }
+.chest-box {
+  width: 110px; height: 90px;
+  border-radius: 12px 12px 14px 14px;
+  position: relative;
+  background: linear-gradient(160deg, #2a3344, #1a2030);
+  border: 2px solid rgba(255,255,255,0.1);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.chest-lid {
+  position: absolute; top: -14px; left: 8%; right: 8%; height: 18px;
+  border-radius: 8px 8px 4px 4px;
+  background: linear-gradient(180deg, #3a4558, #2a3344);
+  border: 2px solid rgba(255,255,255,0.12);
+  border-bottom: none;
+}
+.chest-body-inner {
+  height: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 4px;
+}
+.chest-emoji { font-size: 2.2rem; filter: drop-shadow(0 0 8px rgba(255,255,255,0.2)); }
+.chest-logo { width: 42px; height: 42px; object-fit: contain; }
+.chest-brand {
+  font-size: 0.65rem; font-weight: 800; letter-spacing: 1px;
+  color: rgba(255,255,255,0.7); text-transform: uppercase;
+}
+
+.nft-glow { filter: drop-shadow(0 0 18px rgba(168,85,247,0.45)); }
+.nft-chest { border-color: rgba(168,85,247,0.4); background: linear-gradient(160deg, #2a2040, #1a1528); }
+.nft-chest .chest-lid { background: linear-gradient(180deg, #4a3080, #2a2040); border-color: rgba(168,85,247,0.3); }
+
+.bear-glow { filter: drop-shadow(0 0 18px rgba(34,197,94,0.4)); }
+.bear-chest { border-color: rgba(34,197,94,0.35); background: linear-gradient(160deg, #1a3020, #121a14); }
+.bear-chest .chest-lid { background: linear-gradient(180deg, #2a5030, #1a3020); border-color: rgba(34,197,94,0.3); }
+
+.mecha-glow { filter: drop-shadow(0 0 18px rgba(139,92,246,0.5)); }
+.mecha-chest { border-color: rgba(139,92,246,0.4); background: linear-gradient(160deg, #221a38, #140f20); }
+.mecha-chest .chest-lid { background: linear-gradient(180deg, #3a2a60, #221a38); border-color: rgba(139,92,246,0.3); }
+
+.case-name {
+  font-weight: 700; font-size: 1rem; margin-bottom: 6px; color: #e8eaed;
+}
+.case-price-row {
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  font-weight: 700; font-size: 1.05rem; color: #e8eaed;
+}
+.ton-d {
+  color: #0098ea;
+  font-size: 0.85rem;
+  filter: drop-shadow(0 0 6px rgba(0,152,234,0.5));
+}
+
+/* Multi buttons 1GIFT */
+.multi-1gift {
+  display: flex; gap: 8px; justify-content: center; margin: 12px 0;
+}
+.multi-1gift .multi-btn {
+  width: 42px; height: 42px; border-radius: 12px;
+  border: none; background: #1e2433; color: #9ca3af;
+  font-weight: 700; font-size: 1rem; cursor: pointer;
+}
+.multi-1gift .multi-btn.active {
+  background: #2563eb; color: #fff;
+  box-shadow: 0 0 16px rgba(37,99,235,0.4);
+}
+.multi-label {
+  text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 8px;
+}
+.open-chest-preview { text-align: center; margin-bottom: 16px; }
+
+/* Inventory grid like 1GIFT */
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+}
+.inv-item {
+  background: #151820;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 14px 10px;
+  text-align: center;
+  transition: box-shadow 0.2s;
+}
+.inv-item:hover {
+  box-shadow: 0 0 20px rgba(124,92,255,0.15);
+}
+.inv-item .name {
+  font-size: 0.78rem; font-weight: 600; margin-top: 6px;
+  line-height: 1.25; min-height: 2.2em;
+}
+.inv-item .inv-price {
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  margin-top: 6px; font-weight: 700; font-size: 0.9rem;
+}
+.odds-item .oc {
+  display: flex; align-items: center; justify-content: center; gap: 3px;
+  flex-wrap: wrap;
+}

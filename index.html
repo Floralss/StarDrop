@@ -45,7 +45,7 @@
       <div class="logo"><img src="assets/icons/logo.svg" alt=""><span>StarDrop</span></div>
       <div class="header-right">
         <div class="balance-box">
-          <span class="balance-label">Баланс</span>
+          <span class="ton-icon" title="TON">◆</span>
           <span class="balance-value" id="balance">0.00</span>
           <span class="balance-currency">TON</span>
         </div>
@@ -71,48 +71,51 @@
 
     <main id="page-cases" class="page">
       <section class="hero">
-        <h1>1GIFT-style кейсы Telegram</h1>
-        <p>Звёзды, мишки, NFT и коллекционные подарки Telegram. Баланс в TON.</p>
+        <h1>Vibes</h1>
+        <p>Кейсы с подарками Telegram · NFT · мишки</p>
       </section>
       <div class="cases-grid">
-        <div class="case-card" data-case="nft">
-          <div class="case-visual nft-case"><div class="case-glow"></div>
-            <div class="case-body"><div class="case-front-custom">
-              <img src="assets/icons/nft-case.svg" alt="NFT"><span class="case-label">NFT</span>
-            </div></div>
+        <div class="case-card gift-style" data-case="nft">
+          <div class="chest-wrap nft-glow">
+            <div class="chest-box nft-chest">
+              <div class="chest-lid"></div>
+              <div class="chest-body-inner">
+                <span class="chest-emoji">💎</span>
+                <span class="chest-brand">NFT</span>
+              </div>
+            </div>
           </div>
-          <div class="case-info">
-            <h3>Кейс NFT</h3>
-            <p>Редкие NFT из Telegram. Шанс на мифические — крайне низкий.</p>
-            <div class="case-price"><span class="price">2.5</span> TON</div>
-            <button class="btn btn-open" data-case="nft">Открыть</button>
-          </div>
+          <div class="case-name">NFT Box</div>
+          <div class="case-price-row"><span class="ton-d">◆</span> <span class="price">2.50</span></div>
+          <button class="btn btn-open" data-case="nft">Открыть</button>
         </div>
-        <div class="case-card" data-case="bear">
-          <div class="case-visual bear-case"><div class="case-glow"></div>
-            <div class="case-body"><div class="case-front-custom">
-              <img src="assets/icons/bear-case.svg" alt="Мишка"><span class="case-label">МИШКА</span>
-            </div></div>
+        <div class="case-card gift-style" data-case="bear">
+          <div class="chest-wrap bear-glow">
+            <div class="chest-box bear-chest">
+              <div class="chest-lid"></div>
+              <div class="chest-body-inner">
+                <span class="chest-emoji">🧸</span>
+                <span class="chest-brand">BEAR</span>
+              </div>
+            </div>
           </div>
-          <div class="case-info">
-            <h3>Кейс Мишка</h3>
-            <p>Мишки, сердечки и редкий белый пушистый NFT-медведь.</p>
-            <div class="case-price"><span class="price">0.8</span> TON</div>
-            <button class="btn btn-open" data-case="bear">Открыть</button>
-          </div>
+          <div class="case-name">Animal's Box</div>
+          <div class="case-price-row"><span class="ton-d">◆</span> <span class="price">0.80</span></div>
+          <button class="btn btn-open" data-case="bear">Открыть</button>
         </div>
-        <div class="case-card" data-case="mecha">
-          <div class="case-visual mecha-case"><div class="case-glow"></div>
-            <div class="case-body"><div class="case-front-custom">
-              <img src="assets/cases/mecha-logo.png" alt="MechaGram" class="mecha-logo-img"><span class="case-label">MECHA</span>
-            </div></div>
+        <div class="case-card gift-style" data-case="mecha">
+          <div class="chest-wrap mecha-glow">
+            <div class="chest-box mecha-chest">
+              <div class="chest-lid"></div>
+              <div class="chest-body-inner">
+                <img src="assets/cases/mecha-logo.png" alt="" class="chest-logo">
+                <span class="chest-brand">MECHA</span>
+              </div>
+            </div>
           </div>
-          <div class="case-info">
-            <h3>Кейс MechaGram</h3>
-            <p>Всё подряд: звёзды, подарки, NFT и эксклюзивы MechaGram.</p>
-            <div class="case-price"><span class="price">5.0</span> TON</div>
-            <button class="btn btn-open" data-case="mecha">Открыть</button>
-          </div>
+          <div class="case-name">MechaGram Box</div>
+          <div class="case-price-row"><span class="ton-d">◆</span> <span class="price">5.00</span></div>
+          <button class="btn btn-open" data-case="mecha">Открыть</button>
         </div>
       </div>
     </main>
@@ -247,29 +250,25 @@
       <h2 class="page-title">Админ-панель</h2>
       <p class="page-hint">Заявки + выдача TON и подарков по ID или @username.</p>
       <div class="admin-give-box">
-        <h3>Выдать TON / подарок</h3>
+        <h3>Управление балансом и подарками</h3>
         <div class="admin-give-row">
           <input type="text" id="give-target" placeholder="ID или @username">
-          <select id="give-type"><option value="ton">TON</option><option value="gift">Подарок</option></select>
+          <select id="give-type">
+            <option value="ton">+ TON (выдать)</option>
+            <option value="take">− TON (списать)</option>
+            <option value="gift">Подарок / NFT</option>
+          </select>
         </div>
         <div class="admin-give-row" id="give-ton-row">
           <input type="number" id="give-amount" min="0.1" step="0.1" placeholder="Сумма TON">
-          <button class="btn btn-approve" id="give-ton-btn">Выдать TON</button>
+          <button class="btn btn-approve" id="give-ton-btn">Применить TON</button>
         </div>
         <div class="admin-give-row hidden" id="give-gift-row">
-          <select id="give-gift-select">
-            <option value="teddy|🧸|Teddy Bear|common|0.1">🧸 Teddy Bear</option>
-            <option value="heart|❤️|Love Heart|common|0.08">❤️ Love Heart</option>
-            <option value="stars50|🌟|50 Stars|uncommon|0.5">🌟 50 Stars</option>
-            <option value="nft_c|💎|NFT Common|rare|1.2">💎 NFT Common</option>
-            <option value="nft_r|💠|NFT Rare|epic|4.0">💠 NFT Rare</option>
-            <option value="white_bear|🤍🧸|White Plush Bear|rare|1.5">🤍🧸 White Bear</option>
-            <option value="nft_bear|🐻‍❄️✨|NFT White Fluffy Bear|epic|8.0">🐻‍❄️ NFT Bear</option>
-            <option value="mecha|🤖|Mecha Suit|legendary|40.0">🤖 Mecha Suit</option>
-          </select>
-          <button class="btn btn-approve" id="give-gift-btn">Выдать подарок</button>
+          <select id="give-gift-select"></select>
+          <button class="btn btn-approve" id="give-gift-btn">Выдать NFT</button>
         </div>
       </div>
+
       <div class="admin-tabs">
         <button class="admin-tab active" data-admin="deposits">Пополнения <span id="dep-count" class="badge">0</span></button>
         <button class="admin-tab" data-admin="withdrawals">Выводы <span id="wd-count" class="badge">0</span></button>
@@ -285,19 +284,28 @@
 
       <!-- Preview: what can drop + chances -->
       <div id="case-preview">
+        <div class="open-chest-preview" id="open-chest-preview">
+          <div class="chest-wrap big" id="preview-chest">
+            <div class="chest-box">
+              <div class="chest-lid"></div>
+              <div class="chest-body-inner"><span class="chest-emoji" id="preview-chest-emoji">🎁</span></div>
+            </div>
+          </div>
+          <div class="case-name" id="preview-case-name">Кейс</div>
+          <div class="case-price-row"><span class="ton-d">◆</span> <span id="preview-case-price">0.00</span></div>
+        </div>
         <p class="preview-title">Что может выпасть</p>
         <div id="case-odds-list" class="odds-list"></div>
-        <div class="multi-row">
-          <label>Открыть за раз:</label>
-          <div class="multi-btns">
-            <button class="multi-btn active" data-multi="1">x1</button>
-            <button class="multi-btn" data-multi="2">x2</button>
-            <button class="multi-btn" data-multi="3">x3</button>
-            <button class="multi-btn" data-multi="5">x5</button>
-          </div>
+        <p class="multi-label">Сколько открыть?</p>
+        <div class="multi-btns multi-1gift">
+          <button class="multi-btn active" data-multi="1">1</button>
+          <button class="multi-btn" data-multi="2">2</button>
+          <button class="multi-btn" data-multi="3">3</button>
+          <button class="multi-btn" data-multi="4">4</button>
+          <button class="multi-btn" data-multi="5">5</button>
         </div>
-        <p class="multi-price" id="multi-price">Итого: 0 TON</p>
-        <button class="btn btn-primary btn-spin" id="spin-btn">Крутить</button>
+        <p class="multi-price" id="multi-price">Итого: ◆ 0.00</p>
+        <button class="btn btn-primary btn-spin" id="spin-btn">Открыть</button>
       </div>
 
       <!-- Roulette phase -->

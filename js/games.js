@@ -272,10 +272,13 @@ const GiftUpgrade = {
       landAngle = (chance / 100) * 360 + Math.random() * ((100 - chance) / 100) * 360;
     }
     const endDeg = baseSpins + landAngle;
+    spinEl.style.strokeDasharray = '28 506';
+    spinEl.style.opacity = '1';
     spinEl.style.setProperty('--spin-end', endDeg + 'deg');
     spinEl.classList.remove('spinning');
     spinEl.offsetHeight;
     spinEl.classList.add('spinning');
+    setTimeout(() => { spinEl.style.opacity = '0.9'; }, 4200);
 
     await new Promise(r => setTimeout(r, 4200));
     spinEl.classList.remove('spinning');

@@ -215,7 +215,7 @@ function updateUI() {
   renderInventory();
   renderHistory();
   loadUserRequests();
-  if (isAdmin) loadAdminRequests();
+  if (isAdmin) { loadAdminRequests(); buildAdminGiftList(); }
 }
 
 async function setBalance(newBal) {
@@ -462,10 +462,22 @@ async function handleWd(id, action) {
 
 // ADMIN GIVE
 document.getElementById('give-type').addEventListener('change', e => {
-  const isTon = e.target.value === 'ton';
-  document.getElementById('give-ton-row').classList.toggle('hidden', !isTon);
-  document.getElementById('give-gift-row').classList.toggle('hidden', isTon);
+  const v = e.target.value;
+  const isGift = v === 'gift';
+  document.getElementById('give-ton-row').classList.toggle('hidden', isGift);
+  document.getElementById('give-gift-row').classList.toggle('hidden', !isGift);
 });
+
+function buildAdminGiftList() {
+  const sel = document.getElementById('give-gift-select');
+  if (!sel || typeof CASES === 'undefined') return;
+  const map = {};
+  Object.values(CASES).forEach(c => c.items.forEach(i => { map[i.id] = i; }));
+  const list = Object.values(map).sort((a,b) => (b.value||0)-(a.value||0));
+  sel.innerHTML = list.map(i =>
+    '<option value="' + i.id + '">' + i.emoji + ' ' + i.name + ' (' + i.rarity + ', ' + (i.value||0) + ' TON)</option>'
+  ).join('');
+}
 
 async function findUser(target) {
   target = target.trim();
@@ -489,25 +501,37 @@ document.getElementById('give-ton-btn').addEventListener('click', async () => {
   if (!isAdmin) return;
   const target = document.getElementById('give-target').value;
   const amount = parseFloat(document.getElementById('give-amount').value);
+  const mode = document.getElementById('give-type').value;
   if (!amount || amount <= 0) return showToast('Укажи сумму', 'error');
   const user = await findUser(target);
   if (!user) return showToast('Пользователь не найден', 'error');
-  await db.collection('users').doc(user.id).update({ balance: (user.data.balance || 0) + amount });
-  showToast('+' + amount + ' TON → ' + (user.data.username || target), 'success');
+  let bal = user.data.balance || 0;
+  if (mode === 'take') {
+    bal = Math.max(0, bal - amount);
+    await db.collection('users').doc(user.id).update({ balance: bal });
+    showToast('−' + amount + ' TON у ' + (user.data.username || target) + ' (осталось ' + bal.toFixed(2) + ')', 'success');
+  } else {
+    bal = bal + amount;
+    await db.collection('users').doc(user.id).update({ balance: bal });
+    showToast('+' + amount + ' TON → ' + (user.data.username || target), 'success');
+  }
   if (user.id === currentUser.uid) await loadUserData();
 });
 
 document.getElementById('give-gift-btn').addEventListener('click', async () => {
   if (!isAdmin) return;
   const target = document.getElementById('give-target').value;
-  const val = document.getElementById('give-gift-select').value;
-  const [id, emoji, name, rarity, value] = val.split('|');
+  const gid = document.getElementById('give-gift-select').value;
+  const map = {};
+  Object.values(CASES).forEach(c => c.items.forEach(i => { map[i.id] = i; }));
+  const gift = map[gid];
+  if (!gift) return showToast('Выбери подарок', 'error');
   const user = await findUser(target);
   if (!user) return showToast('Пользователь не найден', 'error');
   const inv = user.data.inventory || [];
-  inv.unshift({ id, emoji, name, rarity, value: parseFloat(value), wonAt: new Date().toISOString(), fromAdmin: true });
+  inv.unshift({ ...gift, wonAt: new Date().toISOString(), fromAdmin: true });
   await db.collection('users').doc(user.id).update({ inventory: inv });
-  showToast(emoji + ' ' + name + ' → ' + (user.data.username || target), 'success');
+  showToast(gift.emoji + ' ' + gift.name + ' → ' + (user.data.username || target), 'success');
   if (user.id === currentUser.uid) await loadUserData();
 });
 
@@ -574,11 +598,25 @@ function openCase(caseId) {
   document.getElementById('case-spin-phase').classList.add('hidden');
   document.getElementById('spin-result').classList.add('hidden');
   document.getElementById('spin-btn').disabled = false;
-  document.getElementById('spin-btn').textContent = 'Крутить';
+  document.getElementById('spin-btn').textContent = 'Открыть';
+  // Preview chest
+  const em = document.getElementById('preview-chest-emoji');
+  if (em) em.textContent = caseId === 'nft' ? '💎' : caseId === 'bear' ? '🧸' : '🤖';
+  const pn = document.getElementById('preview-case-name');
+  if (pn) pn.textContent = caseId === 'nft' ? 'NFT Box' : caseId === 'bear' ? "Animal's Box" : 'MechaGram Box';
+  const pp = document.getElementById('preview-case-price');
+  if (pp) pp.textContent = c.price.toFixed(2);
+  const chest = document.getElementById('preview-chest');
+  if (chest) {
+    chest.className = 'chest-wrap big ' + (caseId === 'nft' ? 'nft-glow' : caseId === 'bear' ? 'bear-glow' : 'mecha-glow');
+    const box = chest.querySelector('.chest-box');
+    if (box) box.className = 'chest-box ' + (caseId === 'nft' ? 'nft-chest' : caseId === 'bear' ? 'bear-chest' : 'mecha-chest');
+  }
+
   // Odds list
   const odds = getItemChances(caseId);
   document.getElementById('case-odds-list').innerHTML = odds.map(i =>
-    '<div class="odds-item rarity-' + i.rarity + '">' + (typeof itemVisual==='function'?itemVisual(i):'<span class="oe">'+i.emoji+'</span>') + '<div class="on">' + i.name + '</div><div class="oc">' + i.chance.toFixed(2) + '% · ' + i.value + ' TON</div></div>'
+    '<div class="odds-item rarity-' + i.rarity + '">' + (typeof itemVisual==='function'?itemVisual(i):'<span class="oe">'+i.emoji+'</span>') + '<div class="on">' + i.name + '</div><div class="oc">' + i.chance.toFixed(2) + '%</div><div class="oc"><span class="ton-d">◆</span> ' + i.value + '</div></div>'
   ).join('');
   updateMultiPrice();
   document.getElementById('spin-modal').classList.remove('hidden');
@@ -588,7 +626,7 @@ function updateMultiPrice() {
   const c = CASES[currentCase];
   if (!c) return;
   const total = c.price * multiCount;
-  document.getElementById('multi-price').textContent = 'Итого: ' + total.toFixed(2) + ' TON';
+  document.getElementById('multi-price').textContent = 'Итого: ◆ ' + (CASES[currentCase].price * multiCount).toFixed(2);
 }
 
 document.querySelectorAll('.multi-btn').forEach(btn => {
@@ -715,7 +753,7 @@ function renderInventory() {
   const inv = userData.inventory || [];
   if (!inv.length) { g.innerHTML = '<p class="empty-state">Пока пусто</p>'; return; }
   g.innerHTML = inv.map((i, idx) =>
-    '<div class="inv-item">' + (typeof itemVisual==='function'?itemVisual(i):'<span class="emoji">'+i.emoji+'</span>') + '<div class="name">' + i.name + '</div><div class="rarity ' + i.rarity + '">' + i.rarity + '</div><div style="color:var(--accent);font-size:0.75rem;margin-top:4px">' + (i.value||0).toFixed(2) + ' TON</div><button class="btn-sell" data-idx="' + idx + '">Продать</button></div>'
+    '<div class="inv-item">' + (typeof itemVisual==='function'?itemVisual(i):'<span class="emoji">'+i.emoji+'</span>') + '<div class="name">' + i.name + '</div><div class="rarity ' + i.rarity + '">' + i.rarity + '</div><div class="inv-price"><span class="ton-d">◆</span> ' + (i.value||0).toFixed(2) + '</div><button class="btn-sell" data-idx="' + idx + '">Продать</button></div>'
   ).join('');
   g.querySelectorAll('.btn-sell').forEach(btn => {
     btn.addEventListener('click', () => sellItem(parseInt(btn.dataset.idx, 10)));
