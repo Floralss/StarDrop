@@ -630,6 +630,7 @@ async function loadLeaderboard() {
 
 
 // CASES
+const getItemChances = (id) => (typeof getCaseOdds === "function" ? getCaseOdds(id) : []);
 document.querySelectorAll('.btn-open').forEach(btn => {
   btn.addEventListener('click', () => openCase(btn.dataset.case));
 });
@@ -659,7 +660,7 @@ function openCase(caseId) {
 
 
   // Odds list
-  const odds = getItemChances(caseId);
+  const odds = getCaseOdds(caseId);
   document.getElementById('case-odds-list').innerHTML = odds.map(i =>
     '<div class="odds-item rarity-' + i.rarity + '">' + (typeof itemVisual==='function'?itemVisual(i):'<span class="oe">'+i.emoji+'</span>') + '<div class="on">' + i.name + '</div><div class="oc">' + i.chance.toFixed(2) + '%</div><div class="oc"><span class="ton-d">◆</span> ' + i.value + '</div></div>'
   ).join('');

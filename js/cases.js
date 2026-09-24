@@ -11,7 +11,7 @@ const G = (id, name, emoji, rarity, value, weight, shortName) => ({
 
 const CASES = {
   nft: {
-    id: 'nft', name: 'Кейс NFT', price: 2.5, color: '#a855f7',
+    id: 'nft', name: 'Кейс NFT', price: 25, color: '#a855f7',
     items: [
       // commons / stars-like
       G('love_heart','Love Heart','💙','common',0.05,2200,'love_heart'),
@@ -39,7 +39,7 @@ const CASES = {
     ]
   },
   bear: {
-    id: 'bear', name: 'Кейс Мишка', price: 0.8, color: '#f97316',
+    id: 'bear', name: 'Кейс Мишка', price: 8, color: '#f97316',
     items: [
       G('teddy','Teddy Bear','🧸','common',0.05,3200,'teddy_bear'),
       G('love_heart','Love Heart','💙','common',0.05,2800,'love_heart'),
@@ -56,7 +56,7 @@ const CASES = {
     ]
   },
   mecha: {
-    id: 'mecha', name: 'Кейс MechaGram', price: 5.0, color: '#8b5cf6',
+    id: 'mecha', name: 'Кейс MechaGram', price: 50, color: '#8b5cf6',
     items: [
       G('love_heart','Love Heart','💙','common',0.05,1400,'love_heart'),
       G('teddy','Teddy Bear','🧸','common',0.05,1300,'teddy_bear'),
