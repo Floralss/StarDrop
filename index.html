@@ -266,7 +266,10 @@
     </main>
 
     <main id="page-inventory" class="page hidden">
-      <h2 class="page-title">Инвентарь</h2>
+      <div class="inv-header">
+          <h2 class="page-title">Инвентарь</h2>
+          <button type="button" class="btn btn-primary" id="sell-all-btn" onclick="sellAllInventory()">Продать всё</button>
+        </div>
       <p class="page-hint">Вывод предмета — через заявку. Админ свяжется в Telegram.</p>
       <div id="inventory-grid" class="inventory-grid"><p class="empty-state">Пока пусто</p></div>
     </main>

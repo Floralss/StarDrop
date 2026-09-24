@@ -635,7 +635,6 @@ document.querySelectorAll('.btn-open').forEach(btn => {
 });
 
 function openCase(caseId) {
-  if (window.SFX) SFX.openCase();
   const c = CASES[caseId]; if (!c) return;
   currentCase = caseId; currentWinner = null; isSpinning = false; pendingWins = [];
   multiCount = 1;
@@ -814,6 +813,24 @@ function renderInventory() {
     btn.addEventListener('click', () => sellItem(parseInt(btn.dataset.idx, 10)));
   });
 }
+
+
+async function sellAllInventory() {
+  if (!userData || !userData.inventory || !userData.inventory.length) {
+    return showToast('Инвентарь пуст', 'error');
+  }
+  const items = [...userData.inventory];
+  let total = 0;
+  items.forEach(it => { total += Number(it.value) || 0; });
+  if (!confirm('Продать всё (' + items.length + ' шт.) за ' + total.toFixed(2) + ' TON?')) return;
+  if (window.SFX) SFX.coin();
+  await setBalance((userData.balance || 0) + total);
+  userData.inventory = [];
+  await updateUser({ inventory: [] });
+  renderInventory();
+  showToast('Продано всё: +' + total.toFixed(2) + ' TON', 'success');
+}
+window.sellAllInventory = sellAllInventory;
 
 async function sellItem(idx) {
   if (window.SFX) SFX.coin();
