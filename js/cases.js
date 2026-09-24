@@ -1,5 +1,4 @@
-// Case definitions with realistic low NFT odds
-// RTP designed so house edge is strong; NFT chances are very small
+// Case definitions — low NFT odds, higher for bears/hearts
 
 const CASES = {
   nft: {
@@ -8,59 +7,44 @@ const CASES = {
     price: 2.5,
     color: '#a855f7',
     items: [
-      // Common ~55%
       { id: 'stars_5', name: '5 Stars', emoji: '⭐', rarity: 'common', value: 0.05, weight: 2800 },
       { id: 'stars_10', name: '10 Stars', emoji: '✨', rarity: 'common', value: 0.1, weight: 2000 },
       { id: 'heart', name: 'Love Heart', emoji: '❤️', rarity: 'common', value: 0.08, weight: 1500 },
       { id: 'rose', name: 'Red Rose', emoji: '🌹', rarity: 'common', value: 0.12, weight: 1200 },
-      // Uncommon ~25%
       { id: 'cake', name: 'Birthday Cake', emoji: '🎂', rarity: 'uncommon', value: 0.25, weight: 800 },
       { id: 'box', name: 'Gift Box', emoji: '🎁', rarity: 'uncommon', value: 0.3, weight: 700 },
       { id: 'stars_50', name: '50 Stars', emoji: '🌟', rarity: 'uncommon', value: 0.5, weight: 500 },
-      // Rare ~12%
       { id: 'nft_common', name: 'NFT Gift (Common)', emoji: '💎', rarity: 'rare', value: 1.2, weight: 400 },
       { id: 'stars_100', name: '100 Stars', emoji: '💫', rarity: 'rare', value: 1.0, weight: 300 },
-      // Epic ~5%
       { id: 'nft_rare', name: 'NFT Gift (Rare)', emoji: '💠', rarity: 'epic', value: 4.0, weight: 120 },
-      // Legendary ~2.5%
       { id: 'nft_epic', name: 'NFT Gift (Epic)', emoji: '🔮', rarity: 'legendary', value: 12.0, weight: 40 },
-      // Mythic ~0.5%  (very low, realistic)
       { id: 'nft_legendary', name: 'NFT Gift (Legendary)', emoji: '👑', rarity: 'mythic', value: 45.0, weight: 8 },
-      // Ultra rare ~0.1%
       { id: 'nft_mythic', name: 'NFT Mythic (Durov)', emoji: '🕶️', rarity: 'mythic', value: 200.0, weight: 2 }
     ]
   },
-
   bear: {
     id: 'bear',
     name: 'Кейс Мишка',
     price: 0.8,
     color: '#f97316',
     items: [
-      // High chance for bears & hearts
       { id: 'teddy', name: 'Teddy Bear', emoji: '🧸', rarity: 'common', value: 0.1, weight: 3200 },
       { id: 'heart_bear', name: 'Heart + Bear', emoji: '🐻❤️', rarity: 'common', value: 0.12, weight: 2500 },
       { id: 'brown_bear', name: 'Brown Bear', emoji: '🐻', rarity: 'common', value: 0.15, weight: 1800 },
       { id: 'love_heart', name: 'Love Heart', emoji: '💕', rarity: 'common', value: 0.08, weight: 1500 },
-      // Uncommon
       { id: 'fluffy', name: 'Fluffy Bear', emoji: '🐻‍❄️', rarity: 'uncommon', value: 0.35, weight: 600 },
       { id: 'stars_bear', name: 'Stars + Bear', emoji: '⭐🧸', rarity: 'uncommon', value: 0.4, weight: 400 },
-      // Rare
       { id: 'white_bear', name: 'White Plush Bear', emoji: '🤍🧸', rarity: 'rare', value: 1.5, weight: 150 },
-      // Epic - NFT Bear (still low)
       { id: 'nft_bear', name: 'NFT White Fluffy Bear', emoji: '🐻‍❄️✨', rarity: 'epic', value: 8.0, weight: 30 },
-      // Legendary
       { id: 'nft_bear_leg', name: 'NFT Legendary Bear', emoji: '👑🐻', rarity: 'legendary', value: 35.0, weight: 5 }
     ]
   },
-
   mecha: {
     id: 'mecha',
     name: 'Кейс MechaGram',
     price: 5.0,
-    color: '#06b6d4',
+    color: '#8b5cf6',
     items: [
-      // Everything possible — still house-favored
       { id: 'stars_20', name: '20 Stars', emoji: '⭐', rarity: 'common', value: 0.2, weight: 2000 },
       { id: 'stars_50', name: '50 Stars', emoji: '✨', rarity: 'common', value: 0.5, weight: 1500 },
       { id: 'teddy_m', name: 'Teddy Bear', emoji: '🧸', rarity: 'common', value: 0.15, weight: 1200 },
@@ -80,40 +64,40 @@ const CASES = {
   }
 };
 
-/**
- * Weighted random selection
- * Returns the item based on weight probabilities
- */
+function getItemChances(caseId) {
+  const caseData = CASES[caseId];
+  if (!caseData) return [];
+  const total = caseData.items.reduce((s, i) => s + i.weight, 0);
+  return caseData.items.map(item => ({
+    ...item,
+    chance: (item.weight / total) * 100
+  })).sort((a, b) => b.chance - a.chance);
+}
+
 function rollItem(caseId) {
   const caseData = CASES[caseId];
   if (!caseData) return null;
-
   const totalWeight = caseData.items.reduce((sum, item) => sum + item.weight, 0);
   let random = Math.random() * totalWeight;
-
   for (const item of caseData.items) {
     random -= item.weight;
-    if (random <= 0) {
-      return { ...item };
-    }
+    if (random <= 0) return { ...item };
   }
   return { ...caseData.items[0] };
 }
 
 /**
- * Generate a long list of items for the roulette visual
- * The winning item will be placed at a specific index
+ * Build roulette strip. Winner is placed at winIndex.
+ * Returns items array and winIndex.
  */
 function generateRouletteItems(caseId, winner, count = 60) {
   const caseData = CASES[caseId];
   const items = [];
-  const winIndex = Math.floor(count * 0.7); // land near the end
-
+  const winIndex = Math.floor(count * 0.72);
   for (let i = 0; i < count; i++) {
     if (i === winIndex) {
       items.push({ ...winner, isWinner: true });
     } else {
-      // pick random item for visual filler
       const filler = caseData.items[Math.floor(Math.random() * caseData.items.length)];
       items.push({ ...filler, isWinner: false });
     }
@@ -121,7 +105,7 @@ function generateRouletteItems(caseId, winner, count = 60) {
   return { items, winIndex };
 }
 
-// Export for use in app.js
 window.CASES = CASES;
 window.rollItem = rollItem;
 window.generateRouletteItems = generateRouletteItems;
+window.getItemChances = getItemChances;

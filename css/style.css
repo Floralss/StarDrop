@@ -583,3 +583,118 @@ body {
   .page { padding: 20px 14px; }
   .nav { padding: 8px 12px; }
 }
+
+/* Case preview odds */
+.preview-title { font-weight: 700; margin-bottom: 12px; text-align: center; }
+.odds-list {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px; max-height: 220px; overflow-y: auto; margin-bottom: 16px;
+  padding: 4px;
+}
+.odds-item {
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px; text-align: center; font-size: 0.8rem;
+}
+.odds-item .oe { font-size: 1.5rem; display: block; margin-bottom: 4px; }
+.odds-item .on { font-weight: 600; margin-bottom: 2px; }
+.odds-item .oc { color: var(--text-muted); font-size: 0.75rem; }
+.odds-item.rarity-common { border-color: #6b7280; }
+.odds-item.rarity-uncommon { border-color: #22c55e; }
+.odds-item.rarity-rare { border-color: #3b82f6; }
+.odds-item.rarity-epic { border-color: #a855f7; }
+.odds-item.rarity-legendary { border-color: #f59e0b; }
+.odds-item.rarity-mythic { border-color: #ef4444; }
+
+.multi-row {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;
+}
+.multi-row label { font-size: 0.85rem; color: var(--text-muted); }
+.multi-btns { display: flex; gap: 6px; }
+.multi-btn {
+  padding: 8px 14px; background: var(--bg-elevated); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text-muted); font-weight: 700; cursor: pointer;
+}
+.multi-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+.multi-price { text-align: center; color: var(--accent); font-weight: 700; margin-bottom: 12px; }
+.spin-progress { text-align: center; color: var(--text-muted); margin-top: 10px; }
+
+#results-list { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-bottom: 16px; }
+.result-card {
+  background: var(--bg-elevated); border: 2px solid var(--border);
+  border-radius: 14px; padding: 14px; text-align: center; min-width: 110px;
+}
+.result-card .re { font-size: 2.2rem; }
+.result-card .rn { font-weight: 600; font-size: 0.85rem; margin-top: 4px; }
+.result-card .rv { color: var(--accent); font-weight: 700; font-size: 0.8rem; }
+
+/* Sell button */
+.inv-item { position: relative; }
+.btn-sell {
+  margin-top: 8px; width: 100%; padding: 6px; font-size: 0.75rem;
+  background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent);
+  border-radius: 8px; cursor: pointer; font-weight: 600;
+}
+.btn-sell:hover { background: var(--accent); color: #07080d; }
+
+/* Screen shake + explosion */
+@keyframes screenShake {
+  0%, 100% { transform: translate(0,0); }
+  10% { transform: translate(-8px, 2px); }
+  20% { transform: translate(8px, -4px); }
+  30% { transform: translate(-6px, 4px); }
+  40% { transform: translate(6px, -2px); }
+  50% { transform: translate(-4px, 3px); }
+  60% { transform: translate(4px, -3px); }
+  70% { transform: translate(-2px, 1px); }
+  80% { transform: translate(2px, -1px); }
+}
+.screen-shake { animation: screenShake 0.55s ease-out; }
+
+.explode-flash {
+  position: fixed; inset: 0; background: rgba(255, 80, 40, 0.35);
+  pointer-events: none; z-index: 9998;
+  animation: flashOut 0.45s ease-out forwards;
+}
+@keyframes flashOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.boom-anim { animation: cellBoom 0.5s ease; }
+.mine-bomb { font-size: 1.6rem; filter: drop-shadow(0 0 8px #ef4444); }
+.mine-gem { font-size: 1.4rem; }
+
+/* Gift upgrade wheel */
+.wheel-wrap {
+  position: relative; width: 220px; height: 220px; margin: 20px auto;
+}
+.wheel-pointer {
+  position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+  width: 0; height: 0; z-index: 5;
+  border-left: 12px solid transparent; border-right: 12px solid transparent;
+  border-top: 18px solid var(--primary);
+  filter: drop-shadow(0 2px 6px rgba(124,92,255,0.5));
+}
+.upgrade-wheel {
+  width: 220px; height: 220px; border-radius: 50%;
+  background: conic-gradient(from 0deg, #1a1d28, #252a3a, #1a1d28);
+  border: 4px solid var(--border);
+  position: relative; overflow: hidden;
+  box-shadow: 0 0 30px rgba(124,92,255,0.2), inset 0 0 40px rgba(0,0,0,0.5);
+}
+.wheel-seg {
+  position: absolute; top: 0; left: 50%; width: 50%; height: 50%;
+  transform-origin: 0% 100%;
+  border-left: 1px solid rgba(255,255,255,0.08);
+}
+.wheel-seg-label {
+  position: absolute; left: 0; top: 0; width: 100%;
+  text-align: center; font-size: 1.3rem;
+  transform-origin: center bottom;
+}
+.upgrade-wheel-result {
+  text-align: center; font-size: 1.2rem; font-weight: 800;
+  min-height: 36px; margin: 12px 0;
+}
+.upgrade-wheel-result.win { color: var(--accent); }
+.upgrade-wheel-result.lose { color: var(--danger); }
+.up-win, .up-lose { display: block; }

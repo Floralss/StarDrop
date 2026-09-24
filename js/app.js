@@ -7,6 +7,8 @@ let currentCase = null;
 let currentWinner = null;
 let isSpinning = false;
 let isAdmin = false;
+let multiCount = 1;
+let pendingWins = [];
 
 const loading = document.getElementById('loading');
 const authModal = document.getElementById('auth-modal');
@@ -410,75 +412,147 @@ async function loadLeaderboard() {
 document.querySelectorAll('.btn-open').forEach(btn => {
   btn.addEventListener('click', () => openCase(btn.dataset.case));
 });
+
 function openCase(caseId) {
   const c = CASES[caseId]; if (!c) return;
-  if ((userData.balance||0) < c.price) return showToast('Недостаточно TON', 'error');
-  currentCase = caseId; currentWinner = null; isSpinning = false;
+  currentCase = caseId; currentWinner = null; isSpinning = false; pendingWins = [];
+  multiCount = 1;
+  document.querySelectorAll('.multi-btn').forEach(b => b.classList.toggle('active', b.dataset.multi === '1'));
   document.getElementById('spin-case-name').textContent = c.name;
+  document.getElementById('case-preview').classList.remove('hidden');
+  document.getElementById('case-spin-phase').classList.add('hidden');
   document.getElementById('spin-result').classList.add('hidden');
-  document.getElementById('spin-btn').classList.remove('hidden');
   document.getElementById('spin-btn').disabled = false;
   document.getElementById('spin-btn').textContent = 'Крутить';
-  const { items } = generateRouletteItems(caseId, c.items[0], 50);
-  renderRoulette(items);
+  // Odds list
+  const odds = getItemChances(caseId);
+  document.getElementById('case-odds-list').innerHTML = odds.map(i =>
+    `<div class="odds-item rarity-${i.rarity}"><span class="oe">${i.emoji}</span><div class="on">${i.name}</div><div class="oc">${i.chance.toFixed(2)}% · ${i.value} TON</div></div>`
+  ).join('');
+  updateMultiPrice();
   document.getElementById('spin-modal').classList.remove('hidden');
 }
+
+function updateMultiPrice() {
+  const c = CASES[currentCase];
+  if (!c) return;
+  const total = c.price * multiCount;
+  document.getElementById('multi-price').textContent = 'Итого: ' + total.toFixed(2) + ' TON';
+}
+
+document.querySelectorAll('.multi-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.multi-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    multiCount = parseInt(btn.dataset.multi, 10);
+    updateMultiPrice();
+  });
+});
+
 function renderRoulette(items) {
   const track = document.getElementById('roulette-track');
-  track.innerHTML = ''; track.style.transition = 'none'; track.style.transform = 'translateX(0)';
+  track.innerHTML = '';
+  track.style.transition = 'none';
+  track.style.transform = 'translateX(0)';
   items.forEach(item => {
     const el = document.createElement('div');
     el.className = 'roulette-item rarity-' + item.rarity;
-    el.innerHTML = `<span class="emoji">${item.emoji}</span><span class="name">${item.name}</span>`;
+    el.innerHTML = '<span class="emoji">' + item.emoji + '</span><span class="name">' + item.name + '</span>';
     track.appendChild(el);
   });
 }
+
+/** Accurate centering: measure real item width including gap */
+function spinOnceToWinner(winner) {
+  return new Promise(resolve => {
+    const { items, winIndex } = generateRouletteItems(currentCase, winner, 60);
+    renderRoulette(items);
+    const track = document.getElementById('roulette-track');
+    const container = track.parentElement;
+    // Force layout
+    track.offsetHeight;
+    const firstItem = track.querySelector('.roulette-item');
+    if (!firstItem) { resolve(); return; }
+    const style = getComputedStyle(track);
+    const gap = parseFloat(style.gap) || 8;
+    const itemW = firstItem.offsetWidth + gap;
+    // padding-left is 50% of container — center of item should land under pointer (center of container)
+    // offset to move winIndex item center to container center:
+    // position of item center from start of content = winIndex * itemW + itemW/2
+    // but track has padding-left = 50% of container width
+    // transform translateX moves the track; we want:
+    // containerWidth/2 = paddingLeft + winIndex*itemW + itemW/2 + translateX
+    // paddingLeft = containerWidth/2, so:
+    // 0 = winIndex*itemW + itemW/2 + translateX
+    // translateX = -(winIndex * itemW + itemW/2)
+    // Wait: with padding 50%, the first item starts at container center when translateX=0.
+    // So item at index 0 center is at: containerCenter + itemW/2 - wait
+    // Actually items start after padding. First item left edge at padding (= center of container).
+    // Center of item 0 = padding + itemW/2 = containerW/2 + itemW/2
+    // Center of item i = containerW/2 + i*itemW + itemW/2
+    // We want center of item i at containerW/2, so translateX = -(i*itemW + itemW/2)
+    const dist = winIndex * itemW + firstItem.offsetWidth / 2;
+    track.style.transition = 'transform 4.8s cubic-bezier(0.12, 0.85, 0.2, 1)';
+    track.style.transform = 'translateX(-' + dist + 'px)';
+    setTimeout(resolve, 5000);
+  });
+}
+
 document.getElementById('spin-btn').addEventListener('click', async () => {
   if (isSpinning || !currentCase) return;
   const c = CASES[currentCase];
-  if ((userData.balance||0) < c.price) return showToast('Недостаточно TON', 'error');
+  const totalCost = c.price * multiCount;
+  if ((userData.balance || 0) < totalCost) return showToast('Недостаточно TON', 'error');
   isSpinning = true;
   document.getElementById('spin-btn').disabled = true;
-  document.getElementById('spin-btn').textContent = 'Крутим...';
   try {
-    await setBalance(userData.balance - c.price);
+    await setBalance(userData.balance - totalCost);
   } catch (e) {
     isSpinning = false; document.getElementById('spin-btn').disabled = false;
-    document.getElementById('spin-btn').textContent = 'Крутить';
     return showToast('Ошибка', 'error');
   }
-  currentWinner = rollItem(currentCase);
-  const { items, winIndex } = generateRouletteItems(currentCase, currentWinner, 60);
-  renderRoulette(items);
-  const track = document.getElementById('roulette-track');
-  const itemW = 118;
-  const dist = winIndex * itemW - (track.parentElement.offsetWidth / 2) + itemW / 2 + Math.random() * 30 - 15;
-  track.offsetHeight;
-  track.style.transition = 'transform 5.5s cubic-bezier(0.15, 0.85, 0.25, 1)';
-  track.style.transform = 'translateX(-' + dist + 'px)';
-  setTimeout(() => {
-    isSpinning = false;
-    document.getElementById('spin-btn').classList.add('hidden');
-    document.getElementById('result-emoji').textContent = currentWinner.emoji;
-    document.getElementById('result-name').textContent = currentWinner.name;
-    const re = document.getElementById('result-rarity');
-    re.textContent = currentWinner.rarity; re.className = 'rarity ' + currentWinner.rarity;
-    document.getElementById('result-value').textContent = currentWinner.value.toFixed(2) + ' TON';
-    document.getElementById('spin-result').classList.remove('hidden');
-  }, 5600);
+
+  document.getElementById('case-preview').classList.add('hidden');
+  document.getElementById('case-spin-phase').classList.remove('hidden');
+  document.getElementById('spin-result').classList.add('hidden');
+  pendingWins = [];
+
+  for (let i = 0; i < multiCount; i++) {
+    document.getElementById('spin-progress').textContent = multiCount > 1 ? ('Открытие ' + (i+1) + ' / ' + multiCount) : 'Крутим...';
+    const winner = rollItem(currentCase);
+    pendingWins.push(winner);
+    await spinOnceToWinner(winner);
+  }
+
+  isSpinning = false;
+  document.getElementById('case-spin-phase').classList.add('hidden');
+  // Show results
+  const list = document.getElementById('results-list');
+  list.innerHTML = pendingWins.map(w =>
+    `<div class="result-card rarity-${w.rarity}"><div class="re">${w.emoji}</div><div class="rn">${w.name}</div><div class="rarity ${w.rarity}">${w.rarity}</div><div class="rv">${w.value.toFixed(2)} TON</div></div>`
+  ).join('');
+  document.getElementById('spin-result').classList.remove('hidden');
 });
+
 document.getElementById('claim-btn').addEventListener('click', async () => {
-  if (!currentWinner) return;
-  const item = { ...currentWinner, caseId: currentCase, wonAt: new Date().toISOString() };
-  const inv = userData.inventory || []; const hist = userData.history || [];
-  inv.unshift(item); hist.unshift({ ...item, caseName: CASES[currentCase].name });
+  if (!pendingWins.length) return;
+  const inv = userData.inventory || [];
+  const hist = userData.history || [];
+  pendingWins.forEach(w => {
+    const item = { ...w, caseId: currentCase, wonAt: new Date().toISOString() };
+    inv.unshift(item);
+    hist.unshift({ ...item, caseName: CASES[currentCase].name });
+  });
   if (hist.length > 50) hist.length = 50;
+  if (inv.length > 100) inv.length = 100;
   await db.collection('users').doc(currentUser.uid).update({ inventory: inv, history: hist });
   userData.inventory = inv; userData.history = hist;
   updateUI();
   document.getElementById('spin-modal').classList.add('hidden');
-  showToast('Получено: ' + item.name, 'success');
+  showToast('Получено предметов: ' + pendingWins.length, 'success');
+  pendingWins = [];
 });
+
 document.getElementById('close-spin').addEventListener('click', () => {
   if (!isSpinning) document.getElementById('spin-modal').classList.add('hidden');
 });
@@ -486,8 +560,30 @@ document.getElementById('close-spin').addEventListener('click', () => {
 function renderInventory() {
   const g = document.getElementById('inventory-grid');
   const inv = userData.inventory || [];
-  g.innerHTML = inv.length ? inv.map(i => `<div class="inv-item"><span class="emoji">${i.emoji}</span><div class="name">${i.name}</div><div class="rarity ${i.rarity}">${i.rarity}</div></div>`).join('') : '<p class="empty-state">Пока пусто</p>';
+  if (!inv.length) { g.innerHTML = '<p class="empty-state">Пока пусто</p>'; return; }
+  g.innerHTML = inv.map((i, idx) =>
+    `<div class="inv-item"><span class="emoji">${i.emoji}</span><div class="name">${i.name}</div><div class="rarity ${i.rarity}">${i.rarity}</div><div style="color:var(--accent);font-size:0.75rem;margin-top:4px">${(i.value||0).toFixed(2)} TON</div><button class="btn-sell" data-idx="${idx}">Продать</button></div>`
+  ).join('');
+  g.querySelectorAll('.btn-sell').forEach(btn => {
+    btn.addEventListener('click', () => sellItem(parseInt(btn.dataset.idx, 10)));
+  });
 }
+
+async function sellItem(idx) {
+  const inv = userData.inventory || [];
+  if (idx < 0 || idx >= inv.length) return;
+  const item = inv[idx];
+  const price = item.value || 0;
+  if (!confirm('Продать «' + item.name + '» за ' + price.toFixed(2) + ' TON?')) return;
+  inv.splice(idx, 1);
+  const newBal = (userData.balance || 0) + price;
+  await db.collection('users').doc(currentUser.uid).update({ inventory: inv, balance: newBal });
+  userData.inventory = inv;
+  userData.balance = newBal;
+  updateUI();
+  showToast('Продано: +' + price.toFixed(2) + ' TON', 'success');
+}
+
 function renderHistory() {
   const l = document.getElementById('history-list');
   const h = userData.history || [];
@@ -514,18 +610,6 @@ window.onRocketWin = async (win) => {
   showToast('Забрал ' + win.toFixed(2) + ' TON', 'success');
 };
 window.onRocketLose = () => {};
-window.onUpgradeWin = async (amount, mult) => {
-  await setBalance((userData.balance || 0) + amount);
-  const el = document.getElementById('upgrade-result');
-  el.textContent = 'Победа! x' + mult.toFixed(2) + ' → +' + amount.toFixed(2) + ' TON';
-  el.className = 'upgrade-result win';
-  showToast('Апгрейд успешен!', 'success');
-};
-window.onUpgradeLose = () => {
-  const el = document.getElementById('upgrade-result');
-  el.textContent = 'Неудача';
-  el.className = 'upgrade-result lose';
-};
 
 // Mines start / cashout
 document.getElementById('mines-start').addEventListener('click', async () => {
@@ -548,15 +632,56 @@ document.getElementById('rocket-start').addEventListener('click', async () => {
 });
 document.getElementById('rocket-cashout').addEventListener('click', () => RocketGame.cashout());
 
-// Upgrade
-document.getElementById('upgrade-go').addEventListener('click', async () => {
-  const bet = parseFloat(document.getElementById('upgrade-bet').value);
-  const chance = parseInt(document.getElementById('upgrade-chance-range').value, 10);
-  if (!bet || bet < 0.5) return showToast('Минимум 0.5 TON', 'error');
-  if ((userData.balance || 0) < bet) return showToast('Недостаточно TON', 'error');
-  await setBalance(userData.balance - bet);
-  UpgradeGame.play(bet, chance);
+// Gift Upgrade
+window.fillUpgradeInventory = function() {
+  const sel = document.getElementById('upgrade-item-select');
+  if (!sel) return;
+  const inv = userData.inventory || [];
+  sel.innerHTML = '<option value="">— выбери —</option>';
+  inv.forEach((item, i) => {
+    const o = document.createElement('option');
+    o.value = i;
+    o.textContent = item.emoji + ' ' + item.name + ' (' + item.rarity + ')';
+    sel.appendChild(o);
+  });
+};
+
+document.getElementById('upgrade-item-select')?.addEventListener('change', e => {
+  const idx = parseInt(e.target.value, 10);
+  const info = document.getElementById('upgrade-chance-info');
+  if (isNaN(idx) || !userData.inventory[idx]) { info.textContent = 'Шанс зависит от редкости'; return; }
+  const item = userData.inventory[idx];
+  const ch = (GiftUpgrade.successChance[item.rarity] || 0.4) * 100;
+  info.textContent = 'Шанс апгрейда «' + item.name + '»: ' + ch.toFixed(0) + '%';
 });
+
+document.getElementById('upgrade-go').addEventListener('click', async () => {
+  if (GiftUpgrade.spinning) return;
+  const idx = parseInt(document.getElementById('upgrade-item-select').value, 10);
+  if (isNaN(idx) || !userData.inventory[idx]) return showToast('Выбери подарок', 'error');
+  const item = userData.inventory[idx];
+  document.getElementById('upgrade-wheel-result').innerHTML = '';
+  document.getElementById('upgrade-wheel-result').className = 'upgrade-wheel-result';
+  document.getElementById('upgrade-go').disabled = true;
+  await GiftUpgrade.spin(item, idx);
+  document.getElementById('upgrade-go').disabled = false;
+});
+
+window.onGiftUpgradeDone = async (success, resultItem, itemIndex) => {
+  const inv = [...(userData.inventory || [])];
+  // Remove original gift
+  if (itemIndex >= 0 && itemIndex < inv.length) inv.splice(itemIndex, 1);
+  if (success && resultItem) {
+    inv.unshift(resultItem);
+    showToast('Апгрейд! ' + resultItem.emoji + ' ' + resultItem.name, 'success');
+  } else {
+    showToast('Подарок сгорел 🔥', 'error');
+  }
+  await db.collection('users').doc(currentUser.uid).update({ inventory: inv });
+  userData.inventory = inv;
+  updateUI();
+  fillUpgradeInventory();
+};
 
 // Backdrop close
 ['spin-modal','deposit-modal','withdraw-modal'].forEach(id => {
