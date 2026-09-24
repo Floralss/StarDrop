@@ -1626,3 +1626,226 @@ body {
   background: linear-gradient(135deg, #a855f7, #7c3aed) !important;
   box-shadow: 0 6px 24px rgba(168, 85, 247, 0.4) !important;
 }
+
+/* ===== NEON / GLOW EFFECTS ===== */
+.case-card.gift-style {
+  position: relative;
+  box-shadow:
+    0 0 0 1px rgba(124, 92, 255, 0.15),
+    0 8px 32px rgba(0, 0, 0, 0.4) !important;
+}
+.case-card.gift-style::before {
+  content: '';
+  position: absolute; inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, transparent 40%, rgba(124, 92, 255, 0.35), transparent 60%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.case-card.gift-style:hover::before { opacity: 1; }
+
+.case-card[data-case="nft"]:hover {
+  box-shadow: 0 0 30px rgba(34, 197, 94, 0.25), 0 0 60px rgba(124, 92, 255, 0.15), 0 12px 40px rgba(0,0,0,0.5) !important;
+}
+.case-card[data-case="bear"]:hover {
+  box-shadow: 0 0 30px rgba(34, 197, 94, 0.35), 0 12px 40px rgba(0,0,0,0.5) !important;
+}
+.case-card[data-case="mecha"]:hover {
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.4), 0 12px 40px rgba(0,0,0,0.5) !important;
+}
+
+.case-card.gift-style .btn-open {
+  position: relative;
+  overflow: hidden;
+  text-shadow: 0 0 12px rgba(255,255,255,0.4);
+}
+.case-card.gift-style .btn-open::after {
+  content: '';
+  position: absolute; top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: btnShine 3s ease-in-out infinite;
+}
+@keyframes btnShine {
+  0%, 100% { left: -100%; }
+  50% { left: 120%; }
+}
+
+.balance-box {
+  box-shadow: 0 0 20px rgba(0, 152, 234, 0.2), inset 0 0 20px rgba(0, 152, 234, 0.05) !important;
+  border: 1px solid rgba(0, 152, 234, 0.3) !important;
+}
+.ton-icon {
+  box-shadow: 0 0 14px rgba(0, 152, 234, 0.7) !important;
+  animation: tonPulse 2.5s ease-in-out infinite;
+}
+@keyframes tonPulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(0, 152, 234, 0.5); }
+  50% { box-shadow: 0 0 18px rgba(0, 152, 234, 0.9); }
+}
+.balance-value {
+  text-shadow: 0 0 16px rgba(0, 229, 160, 0.45) !important;
+}
+
+.nav-btn.active {
+  box-shadow: 0 0 20px rgba(124, 92, 255, 0.35) !important;
+  text-shadow: 0 0 10px rgba(124, 92, 255, 0.5);
+}
+
+.logo {
+  text-shadow: 0 0 20px rgba(124, 92, 255, 0.5);
+  filter: drop-shadow(0 0 8px rgba(124, 92, 255, 0.4));
+}
+
+/* Roulette neon pointer */
+.multi-roulette-row .roulette-pointer,
+.roulette-pointer {
+  box-shadow: 0 0 12px var(--primary), 0 0 24px rgba(124, 92, 255, 0.5) !important;
+}
+
+/* Modal neon border */
+.spin-content {
+  box-shadow: 0 0 40px rgba(124, 92, 255, 0.2), 0 20px 60px rgba(0,0,0,0.6) !important;
+  border: 1px solid rgba(124, 92, 255, 0.25) !important;
+}
+
+/* Item rarity neon */
+.item-vis {
+  box-shadow: 0 0 12px color-mix(in srgb, var(--rc, #6b7280) 50%, transparent) !important;
+}
+.result-card.rarity-mythic,
+.odds-item.rarity-mythic {
+  animation: mythicNeon 1.5s ease-in-out infinite !important;
+}
+@keyframes mythicNeon {
+  0%, 100% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
+  50% { box-shadow: 0 0 28px rgba(239, 68, 68, 0.7), 0 0 50px rgba(239, 68, 68, 0.3); }
+}
+.result-card.rarity-legendary {
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.4) !important;
+}
+.result-card.rarity-epic {
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.35) !important;
+}
+
+/* Game cards neon hover */
+.game-card:hover {
+  box-shadow: 0 0 28px rgba(124, 92, 255, 0.3) !important;
+  border-color: rgba(124, 92, 255, 0.4) !important;
+}
+
+/* Sound toggle */
+.sfx-toggle {
+  position: fixed; bottom: 70px; right: 16px; z-index: 150;
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid rgba(124, 92, 255, 0.4);
+  background: rgba(15, 17, 26, 0.9);
+  color: #a78bfa; font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 0 16px rgba(124, 92, 255, 0.25);
+  display: flex; align-items: center; justify-content: center;
+}
+.sfx-toggle.muted { color: #6b7280; box-shadow: none; }
+@media (max-width: 768px) {
+  .sfx-toggle { bottom: 80px; }
+}
+
+
+/* ===== NEON / GLOW EFFECTS ===== */
+.case-card.gift-style {
+  position: relative;
+  box-shadow:
+    0 0 0 1px rgba(124, 92, 255, 0.15),
+    0 8px 32px rgba(0, 0, 0, 0.4) !important;
+}
+.case-card.gift-style:hover {
+  box-shadow: 0 0 28px rgba(124, 92, 255, 0.3), 0 12px 40px rgba(0,0,0,0.5) !important;
+}
+.case-card[data-case="nft"]:hover {
+  box-shadow: 0 0 30px rgba(34, 197, 94, 0.3), 0 0 50px rgba(124, 92, 255, 0.15) !important;
+}
+.case-card[data-case="bear"]:hover {
+  box-shadow: 0 0 30px rgba(34, 197, 94, 0.4) !important;
+}
+.case-card[data-case="mecha"]:hover {
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.45) !important;
+}
+.case-card.gift-style .btn-open {
+  position: relative;
+  overflow: hidden;
+  text-shadow: 0 0 12px rgba(255,255,255,0.35);
+}
+.case-card.gift-style .btn-open::after {
+  content: '';
+  position: absolute; top: 0; left: -100%;
+  width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  animation: btnShine 3s ease-in-out infinite;
+}
+@keyframes btnShine {
+  0%, 100% { left: -100%; }
+  40% { left: 120%; }
+}
+.balance-box {
+  box-shadow: 0 0 20px rgba(0, 152, 234, 0.25) !important;
+  border: 1px solid rgba(0, 152, 234, 0.35) !important;
+}
+.ton-icon {
+  animation: tonPulse 2.5s ease-in-out infinite;
+}
+@keyframes tonPulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(0, 152, 234, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(0, 152, 234, 0.95); }
+}
+.balance-value {
+  text-shadow: 0 0 14px rgba(0, 229, 160, 0.5) !important;
+}
+.nav-btn.active {
+  box-shadow: 0 0 18px rgba(124, 92, 255, 0.4) !important;
+}
+.logo {
+  filter: drop-shadow(0 0 10px rgba(124, 92, 255, 0.5));
+}
+.spin-content {
+  box-shadow: 0 0 40px rgba(124, 92, 255, 0.25), 0 20px 60px rgba(0,0,0,0.6) !important;
+  border: 1px solid rgba(124, 92, 255, 0.3) !important;
+}
+.item-vis {
+  box-shadow: 0 0 14px color-mix(in srgb, var(--rc, #6b7280) 55%, transparent) !important;
+}
+.result-card.rarity-mythic {
+  animation: mythicNeon 1.4s ease-in-out infinite !important;
+}
+@keyframes mythicNeon {
+  0%, 100% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.45); }
+  50% { box-shadow: 0 0 32px rgba(239, 68, 68, 0.75); }
+}
+.result-card.rarity-legendary {
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.45) !important;
+}
+.result-card.rarity-epic {
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.4) !important;
+}
+.game-card:hover {
+  box-shadow: 0 0 28px rgba(124, 92, 255, 0.35) !important;
+}
+.sfx-toggle {
+  position: fixed; bottom: 70px; right: 16px; z-index: 150;
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid rgba(124, 92, 255, 0.45);
+  background: rgba(15, 17, 26, 0.92);
+  color: #a78bfa; font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 0 16px rgba(124, 92, 255, 0.3);
+  display: flex; align-items: center; justify-content: center;
+}
+.sfx-toggle.muted { color: #6b7280; opacity: 0.7; }
+@media (max-width: 768px) {
+  .sfx-toggle { bottom: 84px; }
+}

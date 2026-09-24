@@ -249,6 +249,7 @@ document.querySelectorAll('.mnav-btn').forEach(btn => {
 });
 
 document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => { if (window.SFX) SFX.click(); });
   btn.addEventListener('click', () => {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
@@ -634,6 +635,7 @@ document.querySelectorAll('.btn-open').forEach(btn => {
 });
 
 function openCase(caseId) {
+  if (window.SFX) SFX.openCase();
   const c = CASES[caseId]; if (!c) return;
   currentCase = caseId; currentWinner = null; isSpinning = false; pendingWins = [];
   multiCount = 1;
@@ -741,6 +743,7 @@ document.getElementById('spin-btn').addEventListener('click', async () => {
   const totalCost = c.price * multiCount;
   if ((userData.balance || 0) < totalCost) return showToast('Недостаточно TON', 'error');
   isSpinning = true;
+  if (window.SFX) SFX.spin();
   document.getElementById('spin-btn').disabled = true;
   try {
     await setBalance(userData.balance - totalCost);
@@ -763,6 +766,13 @@ document.getElementById('spin-btn').addEventListener('click', async () => {
   ).join('');
   pendingWins.forEach(w => { if (w.rarity==='legendary'||w.rarity==='mythic'||w.rarity==='epic') pushLiveWin(w, userData.username); });
   document.getElementById('spin-result').classList.remove('hidden');
+  if (window.SFX) {
+    const ranks = { mythic: 3, legendary: 2, epic: 1, rare: 0 };
+    const bestR = pendingWins.reduce((b, w) => Math.max(b, ranks[w.rarity] ?? -1), -1);
+    if (bestR >= 3) SFX.winMythic();
+    else if (bestR >= 1) SFX.winRare();
+    else SFX.winCommon();
+  }
   // Ceremony for best drop (mythic > legendary > epic)
   const rank = { mythic: 3, legendary: 2, epic: 1 };
   const best = pendingWins.slice().sort((a,b) => (rank[b.rarity]||0) - (rank[a.rarity]||0))[0];
@@ -770,6 +780,7 @@ document.getElementById('spin-btn').addEventListener('click', async () => {
 });
 
 document.getElementById('claim-btn').addEventListener('click', async () => {
+  if (window.SFX) SFX.coin();
   if (!pendingWins.length) return;
   const inv = userData.inventory || [];
   const hist = userData.history || [];
@@ -805,6 +816,7 @@ function renderInventory() {
 }
 
 async function sellItem(idx) {
+  if (window.SFX) SFX.coin();
   const inv = userData.inventory || [];
   if (idx < 0 || idx >= inv.length) return;
   const item = inv[idx];
@@ -856,6 +868,7 @@ document.getElementById('plinko-drop')?.addEventListener('click', async () => {
   if ((userData.balance || 0) < bet) return showToast('Недостаточно TON', 'error');
   await setBalance(userData.balance - bet);
   document.getElementById('plinko-result').textContent = '';
+  if (window.SFX) SFX.spin();
   const res = await PlinkoGame.drop(bet);
   if (!res) return;
   await setBalance((userData.balance || 0) + res.win);
@@ -863,6 +876,7 @@ document.getElementById('plinko-drop')?.addEventListener('click', async () => {
   if (res.mult >= 1) {
     el.textContent = 'x' + res.mult + ' → +' + res.win.toFixed(2) + ' TON';
     el.className = 'cs-upgrade-result win';
+    if (window.SFX) { if (res.mult >= 2) SFX.winRare(); else if (res.mult >= 1) SFX.winCommon(); else SFX.lose(); }
     showToast('Плинко x' + res.mult + '!', 'success');
   } else {
     el.textContent = 'x' + res.mult + ' → ' + res.win.toFixed(2) + ' TON';
@@ -882,10 +896,12 @@ document.getElementById('pepe-start')?.addEventListener('click', async () => {
 });
 
 window.onPepeWin = async (winAmount) => {
+  if (window.SFX) SFX.winRare();
   await setBalance((userData.balance || 0) + winAmount);
   showToast('Pepe найден! +' + winAmount.toFixed(2) + ' TON', 'success');
 };
 window.onPepeLose = () => {
+  if (window.SFX) SFX.lose();
   showToast('Pepe ускользнул', 'error');
 };
 
