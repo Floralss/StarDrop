@@ -629,6 +629,39 @@ async function loadLeaderboard() {
 }
 
 
+
+/** Visual for gift/NFT: CDN img with emoji fallback */
+function itemVisual(item) {
+  if (!item) return '<span class="item-emoji">❓</span>';
+  const emoji = item.emoji || '🎁';
+  const img = item.img || (item.short ? ('https://cdn.jsdelivr.net/gh/ssamy2/TG_Photos@main/webp/by_name/' + item.short + '.webp') : null);
+  if (img) {
+    return '<span class="item-vis" style="--rc:var(--rarity-' + (item.rarity||'common') + ',#6b7280)">' +
+      '<img src="' + img + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'inline\'">' +
+      '<span class="item-emoji" style="display:none">' + emoji + '</span></span>';
+  }
+  return '<span class="item-emoji">' + emoji + '</span>';
+}
+window.itemVisual = itemVisual;
+
+/** Build roulette strip with winner near the end */
+function generateRouletteItems(caseId, winner, count) {
+  count = count || 50;
+  const c = CASES[caseId];
+  const pool = (c && c.items) ? c.items : [winner];
+  const items = [];
+  for (let i = 0; i < count; i++) {
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    items.push({ ...pick });
+  }
+  // place winner around 80-90% of track
+  const winIndex = Math.min(count - 5, Math.max(35, Math.floor(count * 0.82) + Math.floor(Math.random() * 4)));
+  items[winIndex] = { ...winner };
+  return { items, winIndex };
+}
+window.generateRouletteItems = generateRouletteItems;
+
+
 // CASES
 const getItemChances = (id) => (typeof getCaseOdds === "function" ? getCaseOdds(id) : []);
 document.querySelectorAll('.btn-open').forEach(btn => {
@@ -756,10 +789,18 @@ document.getElementById('spin-btn').addEventListener('click', async () => {
   document.getElementById('case-spin-phase').classList.remove('hidden');
   document.getElementById('spin-result').classList.add('hidden');
   pendingWins = [];
-  for (let i = 0; i < multiCount; i++) pendingWins.push(rollItem(currentCase));
-  document.getElementById('spin-progress').textContent = multiCount > 1 ? ('Крутим x' + multiCount + '…') : 'Крутим…';
-  await spinAllSimultaneous(pendingWins);
+  try {
+    for (let i = 0; i < multiCount; i++) pendingWins.push(rollItem(currentCase));
+    const prog = document.getElementById('spin-progress');
+    if (prog) prog.textContent = multiCount > 1 ? ('Крутим x' + multiCount + '…') : 'Крутим…';
+    await spinAllSimultaneous(pendingWins);
+  } catch (err) {
+    console.error('spin error', err);
+    showToast('Ошибка крутки: ' + (err.message || err), 'error');
+    // still show results if we have wins
+  }
   isSpinning = false;
+  document.getElementById('spin-btn').disabled = false;
   document.getElementById('case-spin-phase').classList.add('hidden');
   document.getElementById('results-list').innerHTML = pendingWins.map(w =>
     '<div class="result-card rarity-' + w.rarity + '">' + (typeof itemVisual==='function'?itemVisual(w):'<div class="re">'+w.emoji+'</div>') + '<div class="rn">' + w.name + '</div><div class="rarity ' + w.rarity + '">' + w.rarity + '</div><div class="rv">' + w.value.toFixed(2) + ' TON</div></div>'
