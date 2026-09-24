@@ -815,37 +815,71 @@ function renderInventory() {
 }
 
 
+let _sellingLock = false;
+
 async function sellAllInventory() {
-  if (!userData || !userData.inventory || !userData.inventory.length) {
-    return showToast('Инвентарь пуст', 'error');
-  }
-  const items = [...userData.inventory];
+  if (_sellingLock) return;
+  if (!currentUser || !userData) return showToast('Не авторизован', 'error');
+  const inv = Array.isArray(userData.inventory) ? userData.inventory : [];
+  if (!inv.length) return showToast('Инвентарь пуст', 'error');
   let total = 0;
-  items.forEach(it => { total += Number(it.value) || 0; });
-  if (!confirm('Продать всё (' + items.length + ' шт.) за ' + total.toFixed(2) + ' TON?')) return;
-  if (window.SFX) SFX.coin();
-  await setBalance((userData.balance || 0) + total);
-  userData.inventory = [];
-  await updateUser({ inventory: [] });
-  renderInventory();
-  showToast('Продано всё: +' + total.toFixed(2) + ' TON', 'success');
+  inv.forEach(it => { total += Number(it && it.value) || 0; });
+  if (!confirm('Продать всё (' + inv.length + ' шт.) за ' + total.toFixed(2) + ' TON?')) return;
+  _sellingLock = true;
+  try {
+    if (window.SFX) SFX.coin();
+    const newBal = (Number(userData.balance) || 0) + total;
+    // One atomic write: empty inventory + new balance
+    await db.collection('users').doc(currentUser.uid).update({
+      inventory: [],
+      balance: newBal
+    });
+    userData.inventory = [];
+    userData.balance = newBal;
+    if (balanceEl) balanceEl.textContent = newBal.toFixed(2);
+    renderInventory();
+    showToast('Продано всё: +' + total.toFixed(2) + ' TON', 'success');
+  } catch (e) {
+    console.error('sellAll', e);
+    showToast('Ошибка продажи: ' + (e.message || e), 'error');
+    // reload from server to avoid desync
+    try { await loadUserData(); } catch (_) {}
+  } finally {
+    _sellingLock = false;
+  }
 }
 window.sellAllInventory = sellAllInventory;
 
 async function sellItem(idx) {
-  if (window.SFX) SFX.coin();
-  const inv = userData.inventory || [];
+  if (_sellingLock) return;
+  if (!currentUser || !userData) return;
+  const inv = Array.isArray(userData.inventory) ? [...userData.inventory] : [];
   if (idx < 0 || idx >= inv.length) return;
   const item = inv[idx];
-  const price = item.value || 0;
-  if (!confirm('Продать «' + item.name + '» за ' + price.toFixed(2) + ' TON?')) return;
-  inv.splice(idx, 1);
-  const newBal = (userData.balance || 0) + price;
-  await db.collection('users').doc(currentUser.uid).update({ inventory: inv, balance: newBal });
-  userData.inventory = inv;
-  userData.balance = newBal;
-  updateUI();
-  showToast('Продано: +' + price.toFixed(2) + ' TON', 'success');
+  if (!item) return;
+  const price = Number(item.value) || 0;
+  if (!confirm('Продать «' + (item.name || 'предмет') + '» за ' + price.toFixed(2) + ' TON?')) return;
+  _sellingLock = true;
+  try {
+    if (window.SFX) SFX.coin();
+    inv.splice(idx, 1);
+    const newBal = (Number(userData.balance) || 0) + price;
+    await db.collection('users').doc(currentUser.uid).update({
+      inventory: inv,
+      balance: newBal
+    });
+    userData.inventory = inv;
+    userData.balance = newBal;
+    if (balanceEl) balanceEl.textContent = newBal.toFixed(2);
+    renderInventory();
+    showToast('Продано: +' + price.toFixed(2) + ' TON', 'success');
+  } catch (e) {
+    console.error('sellItem', e);
+    showToast('Ошибка продажи: ' + (e.message || e), 'error');
+    try { await loadUserData(); } catch (_) {}
+  } finally {
+    _sellingLock = false;
+  }
 }
 
 function renderHistory() {
